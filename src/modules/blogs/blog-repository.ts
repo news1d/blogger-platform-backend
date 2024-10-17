@@ -8,7 +8,7 @@ export const blogRepository = {
     },
     createBlog(body: BlogInputModel){
         const blog: BlogViewModel = {
-            id: Date.now() + Math.random().toString(),
+            id: Date.now().toString() + Math.floor(Math.random() * 1000000).toString(),
             name: body.name,
             description: body.description,
             websiteUrl: body.websiteUrl,
@@ -32,8 +32,9 @@ export const blogRepository = {
         }
     },
     deleteBlogById(id: string){
-        const blogIndex = db.blogs.findIndex(video => video.id === id)
-        if (blogIndex) {
+        const blogIndex = db.blogs.findIndex(blog => blog.id === id)
+
+        if (blogIndex !== -1) {
             db.blogs.splice(blogIndex, 1);
             return true;
         } else {
