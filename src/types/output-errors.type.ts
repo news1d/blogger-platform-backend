@@ -1,5 +1,5 @@
 import {BlogInputModel} from "./blog.types";
-import {PostInputModel} from "./post.type";
+import {PostInputModel} from "./post.types";
 
 
 export type FieldNamesType = keyof BlogInputModel | keyof PostInputModel

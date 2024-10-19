@@ -44,7 +44,7 @@ export const postShortDescriptionValidator = body('shortDescription')
     .notEmpty()
     .withMessage('Please enter a short description.')
     .isLength({min: 3, max: 100})
-    .withMessage('Description should contain 3-100 characters.')
+    .withMessage('Short description should contain 3-100 characters.')
 
 export const postContentValidator = body('content')
     .trim()

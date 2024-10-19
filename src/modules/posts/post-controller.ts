@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {postRepository} from "./post-repository";
 import {HTTP_STATUSES} from "../../http-statuses";
-import {PostInputModel, PostViewModel} from "../../types/post.type"
+import {PostInputModel, PostViewModel} from "../../types/post.types"
 
 
 export const postController = {

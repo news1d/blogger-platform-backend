@@ -1,5 +1,5 @@
 import {db} from "../../db/db";
-import {PostInputModel, PostViewModel} from "../../types/post.type";
+import {PostInputModel, PostViewModel} from "../../types/post.types";
 import {blogRepository} from "../blogs/blog-repository";
 
 export const postRepository = {
