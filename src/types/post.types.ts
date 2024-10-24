@@ -16,6 +16,7 @@ export type PostViewModel = {
 }
 
 export type PostDBType = {
+    _id: string | undefined;
     id: string;
     title: string;
     shortDescription: string;
