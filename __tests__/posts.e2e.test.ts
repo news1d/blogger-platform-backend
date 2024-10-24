@@ -1,16 +1,18 @@
 import request from "supertest";
 import {app} from "../src/app";
-import {clearDB} from "../src/db/db";
+import {clearDB} from "../src/db/mongoDb";
 import {HTTP_STATUSES} from "../src/http-statuses";
-import {authData, postData, postsTestManager} from "./test-helpers";
+import {authData, createPostData, postsTestManager} from "./test-helpers";
 import {SETTINGS} from "../src/settings";
+
 
 describe('/posts', () => {
     // beforeAll(async () => {
-    //     clearDB();
+    //    await clearDB();
     // })
 
     it('unauthorized user shouldn`t create post', async () => {
+        const postData = await createPostData();
         // Проверка на отсутствие авторизации
         await request(app)
             .post(SETTINGS.PATH.POSTS)
@@ -19,6 +21,7 @@ describe('/posts', () => {
     })
 
     it('shouldn`t create post with incorrect title data', async () => {
+        const postData = await createPostData();
         // Проверка на отсутствие заголовка
         await request(app)
             .post(SETTINGS.PATH.POSTS)
@@ -49,6 +52,7 @@ describe('/posts', () => {
     })
 
     it('shouldn`t create post with incorrect shortDescription data', async () => {
+        const postData = await createPostData();
         // Проверка на отсутствие короткого описания
         await request(app)
             .post(SETTINGS.PATH.POSTS)
@@ -79,6 +83,7 @@ describe('/posts', () => {
     })
 
     it('shouldn`t create post with incorrect content data', async () => {
+        const postData = await createPostData();
         // Проверка на отсутствие контента
         await request(app)
             .post(SETTINGS.PATH.POSTS)
@@ -109,6 +114,7 @@ describe('/posts', () => {
     })
 
     it('shouldn`t create post with incorrect blogId data', async () => {
+        const postData = await createPostData();
         // Проверка на отсутствие blogId
         await request(app)
             .post(SETTINGS.PATH.POSTS)
@@ -139,6 +145,7 @@ describe('/posts', () => {
     })
 
     it('should create post with correct input data', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body
@@ -155,6 +162,7 @@ describe('/posts', () => {
     })
 
     it('unauthorized user shouldn`t update post', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body
@@ -167,6 +175,7 @@ describe('/posts', () => {
     })
 
     it('shouldn`t update post with incorrect title data', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body
@@ -201,6 +210,7 @@ describe('/posts', () => {
     })
 
     it('shouldn`t update post with incorrect shortDescription data', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body
@@ -235,6 +245,7 @@ describe('/posts', () => {
     })
 
     it('shouldn`t update post with incorrect content data', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body
@@ -268,7 +279,8 @@ describe('/posts', () => {
             })
     })
 
-    it('shouldn`t create post with incorrect blogId data', async () => {
+    it('shouldn`t update post with incorrect blogId data', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body
@@ -303,6 +315,7 @@ describe('/posts', () => {
     })
 
     it('should update post with correct data', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body
@@ -327,6 +340,7 @@ describe('/posts', () => {
     })
 
     it('unauthorized user shouldn`t delete post', async () => {
+        const postData = await createPostData();
         // Добавляем пост
         const createResponse = await postsTestManager.createPost(postData.validData)
         const createdPost = createResponse.body

@@ -1,14 +1,14 @@
 import request from 'supertest';
 import {SETTINGS} from '../src/settings'
 import {app} from "../src/app";
-import {clearDB} from "../src/db/db";
+import {clearDB} from "../src/db/mongoDb";
 import {HTTP_STATUSES} from "../src/http-statuses";
 import {authData, blogData, blogsTestManager} from "./test-helpers";
 
 
 describe('/blogs', () => {
     beforeAll(async () => {
-        clearDB();
+        await clearDB();
     })
 
     it('should return 204 and empty array', async () => {
