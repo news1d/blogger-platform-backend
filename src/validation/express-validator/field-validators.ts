@@ -59,8 +59,10 @@ export const postBlogIdValidator = body('blogId')
     .isString()
     .notEmpty()
     .withMessage('Please enter a blog ID.')
-    .custom(blogId => {
-        const blog = blogRepository.getBlogById(blogId)
-        return !!blog // Вернет true, если блог существует, и false, если не найден.
+    .custom(async (blogId) => {
+        const blog = await blogRepository.getBlogById(blogId);
+        if (!blog) {
+            throw new Error('Blog ID was not found.');
+        }
+        return true;
     })
-    .withMessage('Blog ID was not found.')
