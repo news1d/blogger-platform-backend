@@ -7,14 +7,7 @@ export type DBType = {
 }
 
 export const db: DBType = {
-    blogs: [
-        {
-            id: Date.now().toString() + Math.floor(Math.random() * 1000000).toString(),
-            name: 'some name',
-            description: 'some description',
-            websiteUrl: 'https://backend.com'
-        }
-    ],
+    blogs: [],
     posts: [],
 }
 
