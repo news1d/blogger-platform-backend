@@ -1,48 +1,44 @@
-import {db} from "../../db/db";
 import {PostInputModel, PostViewModel} from "../../types/post.types";
 import {blogRepository} from "../blogs/blog-repository";
+import {postCollection} from "../../db/mongoDb";
+
 
 export const postRepository = {
-    getPosts() {
-        return db.posts
+    async getPosts(): Promise<PostViewModel[]> {
+        return postCollection.find({}).toArray();
     },
-    createPost(body: PostInputModel){
+    async createPost(body: PostInputModel): Promise<string>{
+        const blog = await blogRepository.getBlogById(body.blogId)
         const post: PostViewModel = {
             id: Date.now().toString() + Math.floor(Math.random() * 1000000).toString(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
             blogId: body.blogId,
-            blogName: blogRepository.getBlogById(body.blogId)!.name,
+            blogName: blog!.name,
+            createdAt: new Date().toISOString()
         }
-        db.posts.push(post);
+        await postCollection.insertOne(post);
         return post.id;
     },
-    getPostById(id: string){
-        return db.posts.find(post => post.id === id)
+    async getPostById(id: string): Promise<PostViewModel | null> {
+        return await postCollection.findOne({id: id});
     },
-    updatePostById(id: string, body: PostInputModel){
-        const post = db.posts.find(post => post.id === id)
+    async updatePostById(id: string, body: PostInputModel): Promise<boolean> {
+        const blog = await blogRepository.getBlogById(body.blogId)
 
-        if (post) {
-            post.title = body.title;
-            post.shortDescription = body.shortDescription;
-            post.content = body.content;
-            post.blogId = body.blogId;
-            post.blogName = blogRepository.getBlogById(body.blogId)!.name;
-            return true;
-        } else {
-            return false;
-        }
+        const result = await postCollection.updateOne({id: id}, {$set: {
+                title: body.title,
+                shortDescription: body.shortDescription,
+                content: body.content,
+                blogId: body.blogId,
+                blogName: blog!.name
+            }})
+
+        return result.matchedCount === 1;
     },
-    deletePostById(id: string){
-        const postIndex = db.posts.findIndex(blog => blog.id === id)
-
-        if (postIndex !== -1) {
-            db.posts.splice(postIndex, 1);
-            return true;
-        } else {
-            return false;
-        }
+    async deletePostById(id: string): Promise<boolean>{
+        const result = await postCollection.deleteOne({id: id});
+        return result.deletedCount === 1;
     }
 }
