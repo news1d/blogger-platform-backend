@@ -1,4 +1,4 @@
-import {PostInputModel, PostViewModel} from "../../types/post.types";
+import {PostDBType, PostInputModel, PostViewModel} from "../../types/post.types";
 import {blogRepository} from "../blogs/blog-repository";
 import {postCollection} from "../../db/mongoDb";
 
@@ -9,7 +9,8 @@ export const postRepository = {
     },
     async createPost(body: PostInputModel): Promise<string>{
         const blog = await blogRepository.getBlogById(body.blogId)
-        const post: PostViewModel = {
+        const post: PostDBType = {
+            _id: undefined,
             id: Date.now().toString() + Math.floor(Math.random() * 1000000).toString(),
             title: body.title,
             shortDescription: body.shortDescription,
@@ -22,7 +23,11 @@ export const postRepository = {
         return post.id;
     },
     async getPostById(id: string): Promise<PostViewModel | null> {
-        return await postCollection.findOne({id: id});
+        const post = await postCollection.findOne({id: id});
+        if (!post) {
+            return null;
+        }
+        return this.mapToOutput(post);
     },
     async updatePostById(id: string, body: PostInputModel): Promise<boolean> {
         const blog = await blogRepository.getBlogById(body.blogId)
@@ -40,5 +45,16 @@ export const postRepository = {
     async deletePostById(id: string): Promise<boolean>{
         const result = await postCollection.deleteOne({id: id});
         return result.deletedCount === 1;
+    },
+    mapToOutput(post: PostDBType): PostViewModel {
+        return {
+            id: post.id,
+            title: post.title,
+            shortDescription: post.shortDescription,
+            content: post.content,
+            blogId: post.blogId,
+            blogName: post.blogName,
+            createdAt: post.createdAt,
+        }
     }
 }
