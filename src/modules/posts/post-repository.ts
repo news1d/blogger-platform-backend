@@ -5,7 +5,8 @@ import {postCollection} from "../../db/mongoDb";
 
 export const postRepository = {
     async getPosts(): Promise<PostViewModel[]> {
-        return postCollection.find({}).toArray();
+        const posts = await postCollection.find({}).toArray();
+        return posts.map(this.mapToOutput)
     },
     async createPost(body: PostInputModel): Promise<string>{
         const blog = await blogRepository.getBlogById(body.blogId)

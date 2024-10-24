@@ -4,7 +4,8 @@ import {blogCollection} from "../../db/mongoDb";
 
 export const blogRepository = {
     async getBlogs(): Promise<BlogViewModel[]> {
-        return blogCollection.find({}).toArray();
+        const blogs = await blogCollection.find({}).toArray();
+        return blogs.map(this.mapToOutput)
     },
     async createBlog(body: BlogInputModel): Promise<string> {
         const blog: BlogDBType = {
