@@ -173,7 +173,6 @@ export const blogsTestManager = {
 
         const createdBlog = response.body;
         expect(createdBlog).toEqual({
-            _id: expect.any(String),
             id: expect.any(String),
             name: data.name,
             description: data.description,
@@ -197,7 +196,6 @@ export const postsTestManager = {
         const createdPost = response.body;
         const blog = await blogRepository.getBlogById(data.blogId)
         expect(createdPost).toEqual({
-            _id: expect.any(String),
             id: expect.any(String),
             title: data.title,
             shortDescription: data.shortDescription,
