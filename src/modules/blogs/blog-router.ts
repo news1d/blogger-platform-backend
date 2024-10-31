@@ -4,7 +4,6 @@ import {
     blogDescriptionValidator,
     blogNameValidator,
     blogWebsiteUrlValidator,
-    postBlogIdValidator,
     postContentValidator,
     postShortDescriptionValidator,
     postTitleValidator
@@ -29,7 +28,6 @@ blogRouter.post('/:blogId/posts', authMiddleware,
     postTitleValidator,
     postShortDescriptionValidator,
     postContentValidator,
-    postBlogIdValidator,
     errorsResultMiddleware,
     blogController.createPostByBlogId)
 blogRouter.get('/:id', blogController.getBlogById);
