@@ -22,6 +22,10 @@ blogRouter.get('/:blogId/posts', validateQueryParams,
     blogController.getPostsByBlogId)
 blogRouter.post('/:blogId/posts', authMiddleware,
     validateQueryParams,
+    blogNameValidator,
+    blogDescriptionValidator,
+    blogWebsiteUrlValidator,
+    errorsResultMiddleware,
     blogController.createPostByBlogId)
 blogRouter.get('/:id', blogController.getBlogById);
 blogRouter.put('/:id', authMiddleware,
