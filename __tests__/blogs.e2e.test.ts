@@ -28,6 +28,41 @@ describe('/blogs', () => {
             })
     })
 
+    it('should return a paginated list of blogs sorted by name', async () => {
+        // Добавляем блоги
+        const firstBlog = {
+            ...blogData.validData,
+            name: 'Timbo blogger'
+        }
+        const secondBlog = {
+            ...blogData.validData,
+            name: 'Timon & Pumbaa'
+        }
+
+        await blogsTestManager.createBlog(blogData.validData)
+        const firstCreateResponse = await blogsTestManager.createBlog(firstBlog)
+        const secondCreateResponse = await blogsTestManager.createBlog(secondBlog)
+        const firstCreatedBlog = firstCreateResponse.body
+        const secondCreatedBlog = secondCreateResponse.body
+
+        await request(app)
+            .get(SETTINGS.PATH.BLOGS)
+            .query({
+                pageSize: 5,
+                pageNumber: 1,
+                searchNameTerm: 'Tim',
+                sortDirection: 'asc',
+                sortBy: 'name',
+            })
+            .expect(HTTP_STATUSES.OK_200, {
+                pagesCount: 1,
+                page: 1,
+                pageSize: 5,
+                totalCount: 2,
+                items: [firstCreatedBlog, secondCreatedBlog]
+            })
+    })
+
     it('should return all posts for correct blogId', async () => {
         // Добавляем сторонний блог
         await blogsTestManager.createBlog(blogData.validData)
