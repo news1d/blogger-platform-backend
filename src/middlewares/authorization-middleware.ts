@@ -1,6 +1,6 @@
 import {SETTINGS} from "../settings";
 import {NextFunction, Request, Response} from "express";
-import {HTTP_STATUSES} from "../http-statuses";
+import {HTTP_STATUSES} from "../helpers/http-statuses";
 
 
 export const ADMIN_AUTH = SETTINGS.ADMIN_AUTH;

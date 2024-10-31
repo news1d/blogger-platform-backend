@@ -3,7 +3,7 @@ import {PostInputModel} from "../src/types/post.types";
 import request from 'supertest';
 import {app} from "../src/app";
 import {SETTINGS} from "../src/settings";
-import {HTTP_STATUSES} from "../src/http-statuses";
+import {HTTP_STATUSES} from "../src/helpers/http-statuses";
 import {blogRepository} from "../src/modules/blogs/blog-repository";
 import {blogCollection} from "../src/db/mongoDb";
 

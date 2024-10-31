@@ -1,7 +1,7 @@
 import request from "supertest";
 import {app} from "../src/app";
 import {clearDB} from "../src/db/mongoDb";
-import {HTTP_STATUSES} from "../src/http-statuses";
+import {HTTP_STATUSES} from "../src/helpers/http-statuses";
 import {authData, createPostData, postsTestManager} from "./test-helpers";
 import {SETTINGS} from "../src/settings";
 
@@ -358,7 +358,7 @@ describe('/posts', () => {
 
         await request(app)
             .get(SETTINGS.PATH.POSTS)
-            .expect(HTTP_STATUSES.OK_200, [])
+            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     })
 
 })

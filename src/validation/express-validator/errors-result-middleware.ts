@@ -1,6 +1,6 @@
 import {NextFunction, Response, Request} from "express";
 import {validationResult} from "express-validator";
-import {HTTP_STATUSES} from "../../http-statuses";
+import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {FieldNamesType, OutputErrorsType} from "../../types/output-errors.type";
 
 
