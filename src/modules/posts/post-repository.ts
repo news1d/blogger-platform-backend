@@ -4,22 +4,37 @@ import {postCollection} from "../../db/mongoDb";
 
 
 export const postRepository = {
-    async getPosts(): Promise<PostViewModel[]> {
-        const posts = await postCollection.find({}).toArray();
+    async getPosts(pageNumber: number,
+                   pageSize: number,
+                   sortBy: string,
+                   sortDirection: 'asc' | 'desc',
+                   blogId?: string): Promise<PostViewModel[]> {
+
+        const filter: any = {}
+
+        if (blogId) {
+            filter.blogId = blogId ;
+        }
+
+        const posts = await postCollection
+            .find(filter)
+            .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+
         return posts.map(this.mapToOutput)
     },
-    async createPost(body: PostInputModel): Promise<string>{
-        const blog = await blogRepository.getBlogById(body.blogId)
-        const post: PostDBType = {
-            _id: undefined,
-            id: Date.now().toString() + Math.floor(Math.random() * 1000000).toString(),
-            title: body.title,
-            shortDescription: body.shortDescription,
-            content: body.content,
-            blogId: body.blogId,
-            blogName: blog!.name,
-            createdAt: new Date().toISOString()
+    async getPostsCount(blogId?: string): Promise<number> {
+        const filter: any = {}
+
+        if (blogId) {
+            filter.blogId = blogId ;
         }
+
+        return postCollection.countDocuments(filter)
+    },
+    async createPost(post: PostDBType): Promise<string>{
         await postCollection.insertOne(post);
         return post.id;
     },

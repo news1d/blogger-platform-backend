@@ -1,22 +1,38 @@
 import {BlogDBType, BlogInputModel, BlogViewModel} from "../../types/blog.types";
 import {blogCollection} from "../../db/mongoDb";
 
-
 export const blogRepository = {
-    async getBlogs(): Promise<BlogViewModel[]> {
-        const blogs = await blogCollection.find({}).toArray();
+    async getBlogs(pageNumber: number,
+                   pageSize: number,
+                   sortBy: string,
+                   sortDirection: 'asc' | 'desc',
+                   searchNameTerm: string | null): Promise<BlogViewModel[]> {
+
+        const filter: any = {}
+
+        if (searchNameTerm) {
+            filter.name = { $regex: searchNameTerm, options: "i" };
+        }
+
+        const blogs = await blogCollection
+            .find(filter)
+            .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+
         return blogs.map(this.mapToOutput)
     },
-    async createBlog(body: BlogInputModel): Promise<string> {
-        const blog: BlogDBType = {
-            _id: undefined,
-            id: Date.now().toString() + Math.floor(Math.random() * 1000000).toString(),
-            name: body.name,
-            description: body.description,
-            websiteUrl: body.websiteUrl,
-            createdAt: new Date().toISOString(),
-            isMembership: false,
+    async getBlogsCount(serchNameTerm: string | null): Promise<number> {
+        const filter: any = {}
+
+        if (serchNameTerm) {
+            filter.name = { $regex: serchNameTerm, options: "i" };
         }
+
+        return blogCollection.countDocuments(filter)
+    },
+    async createBlog(blog: BlogDBType): Promise<string> {
         await blogCollection.insertOne(blog);
         return blog.id
     },

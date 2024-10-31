@@ -1,22 +1,25 @@
 import {Request, Response} from 'express';
-import {postRepository} from "./post-repository";
-import {HTTP_STATUSES} from "../../http-statuses";
+import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {PostInputModel, PostViewModel} from "../../types/post.types"
+import {postService} from "./post-service";
+import {paginationQueries} from "../../helpers/paginations_values";
 
 
 export const postController = {
-    async getPosts (req: Request, res: Response<PostViewModel[]>) {
-        const posts = await postRepository.getPosts();
+    async getPosts (req: Request, res: Response) {
+        const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req)
+
+        const posts = await postService.getPosts(pageNumber, pageSize, sortBy, sortDirection);
         res.status(HTTP_STATUSES.OK_200).json(posts);
     },
     async createPost (req: Request<any, any, PostInputModel>, res: Response<PostViewModel | null>) {
-        const postId = await postRepository.createPost(req.body);
-        const post = await postRepository.getPostById(postId);
+        const postId = await postService.createPost(req.body);
+        const post = await postService.getPostById(postId);
 
         res.status(HTTP_STATUSES.CREATED_201).json(post);
     },
     async getPostById (req: Request<{id: string}>, res: Response<PostViewModel>) {
-        const post = await postRepository.getPostById(req.params.id);
+        const post = await postService.getPostById(req.params.id);
 
         if (post) {
             res.status(HTTP_STATUSES.OK_200).json(post);
@@ -25,7 +28,7 @@ export const postController = {
         }
     },
     async updatePostById (req: Request<{id: string}, any, PostInputModel>, res: Response) {
-        const isUpdated = await postRepository.updatePostById(req.params.id, req.body);
+        const isUpdated = await postService.updatePostById(req.params.id, req.body);
 
         if (isUpdated) {
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -34,7 +37,7 @@ export const postController = {
         }
     },
     async deletePostById (req: Request, res: Response) {
-        const isDeleted = await postRepository.deletePostById(req.params.id);
+        const isDeleted = await postService.deletePostById(req.params.id);
 
         if (isDeleted) {
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
