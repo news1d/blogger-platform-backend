@@ -3,7 +3,11 @@ import {blogController} from "./blog-controller";
 import {
     blogDescriptionValidator,
     blogNameValidator,
-    blogWebsiteUrlValidator
+    blogWebsiteUrlValidator,
+    postBlogIdValidator,
+    postContentValidator,
+    postShortDescriptionValidator,
+    postTitleValidator
 } from "../../validation/express-validator/field-validators";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {authMiddleware} from "../../middlewares/authorization-middleware";
@@ -22,9 +26,10 @@ blogRouter.get('/:blogId/posts', validateQueryParams,
     blogController.getPostsByBlogId)
 blogRouter.post('/:blogId/posts', authMiddleware,
     validateQueryParams,
-    blogNameValidator,
-    blogDescriptionValidator,
-    blogWebsiteUrlValidator,
+    postTitleValidator,
+    postShortDescriptionValidator,
+    postContentValidator,
+    postBlogIdValidator,
     errorsResultMiddleware,
     blogController.createPostByBlogId)
 blogRouter.get('/:id', blogController.getBlogById);
