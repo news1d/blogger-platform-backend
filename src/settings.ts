@@ -5,9 +5,9 @@ export const SETTINGS = {
     PORT: process.env.PORT || 3003,
     ADMIN_AUTH: 'admin:qwerty',
     PATH: {
-        BLOGS: '/hometask_03/api/blogs',
-        POSTS: '/hometask_03/api/posts',
-        TESTING: '/hometask_03/api/testing',
+        BLOGS: '/api/blogs',
+        POSTS: '/api/posts',
+        TESTING: '/api/testing',
     },
     COLLECTION_NAME: {
         BLOG: 'blogs',
