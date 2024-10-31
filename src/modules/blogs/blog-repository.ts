@@ -11,7 +11,7 @@ export const blogRepository = {
         const filter: any = {}
 
         if (searchNameTerm) {
-            filter.name = { $regex: searchNameTerm, options: "i" };
+            filter.name = { $regex: searchNameTerm, $options: "i" };
         }
 
         const blogs = await blogCollection
@@ -27,7 +27,7 @@ export const blogRepository = {
         const filter: any = {}
 
         if (serchNameTerm) {
-            filter.name = { $regex: serchNameTerm, options: "i" };
+            filter.name = { $regex: serchNameTerm, $options: "i" };
         }
 
         return blogCollection.countDocuments(filter)
