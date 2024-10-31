@@ -66,6 +66,12 @@ describe('/blogs', () => {
             })
     })
 
+    it('shouldn`t return posts for incorrect blogId', async () => {
+            await request(app)
+            .get(`${SETTINGS.PATH.BLOGS}/-1/posts`)
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+    })
+
     it('should create post for correct blogId', async () => {
         // Добавляем блог для проверки blogId
         const createResponseBlog = await blogsTestManager.createBlog(blogData.validData)

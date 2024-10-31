@@ -20,10 +20,11 @@ export const blogController = {
         res.status(HTTP_STATUSES.CREATED_201).json(blog);
     },
     async getPostsByBlogId (req: Request<{blogId: string}>, res: Response) {
-        const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req)
-        const posts = await blogService.getPostsByBlogId(req.params.blogId, pageNumber, pageSize, sortBy, sortDirection);
+        const blog = await blogService.getBlogById(req.params.blogId);
 
-        if (posts) {
+        if (blog) {
+            const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req);
+            const posts = await blogService.getPostsByBlogId(req.params.blogId, pageNumber, pageSize, sortBy, sortDirection);
             res.status(HTTP_STATUSES.OK_200).json(posts);
         } else {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
