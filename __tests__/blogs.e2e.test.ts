@@ -2,8 +2,9 @@ import request from 'supertest';
 import {SETTINGS} from '../src/settings'
 import {app} from "../src/app";
 import {clearDB} from "../src/db/mongoDb";
-import {HTTP_STATUSES} from "../src/http-statuses";
-import {authData, blogData, blogsTestManager} from "./test-helpers";
+import {HTTP_STATUSES} from "../src/helpers/http-statuses";
+import {authData, blogData, blogsTestManager, createPostData, postsTestManager} from "./test-helpers";
+import {blogRepository} from "../src/modules/blogs/blog-repository";
 
 
 describe('/blogs', () => {
@@ -18,7 +19,82 @@ describe('/blogs', () => {
 
         await request(app)
             .get(SETTINGS.PATH.BLOGS)
-            .expect(HTTP_STATUSES.OK_200, [])
+            .expect(HTTP_STATUSES.OK_200, {
+                pagesCount: 0,
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                items: []
+            })
+    })
+
+    it('should return all posts for correct blogId', async () => {
+        // Добавляем сторонний блог
+        await blogsTestManager.createBlog(blogData.validData)
+        const postData = await createPostData();
+
+        // Добавляем блог для проверки blogId
+        const createResponseBlog = await blogsTestManager.createBlog(blogData.validData)
+        const blogId = createResponseBlog.body.id
+
+        const validData1 = {
+            ...postData.validData,
+            title: 'first post',
+            blogId: blogId
+        }
+        const validData2 = {
+            ...postData.validData,
+            title: 'second post',
+            blogId: blogId
+        }
+
+        // Добавляем посты
+        await postsTestManager.createPost(postData.validData)
+        const firstCreateResponse = await postsTestManager.createPost(validData1)
+        const secondCreateResponse = await postsTestManager.createPost(validData2)
+        const firstCreatedPost = firstCreateResponse.body
+        const secondCreatedPost = secondCreateResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.BLOGS}/${blogId}/posts`)
+            .expect(HTTP_STATUSES.OK_200, {
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 2,
+                items: [secondCreatedPost, firstCreatedPost]
+            })
+    })
+
+    it('should create post for correct blogId', async () => {
+        // Добавляем блог для проверки blogId
+        const createResponseBlog = await blogsTestManager.createBlog(blogData.validData)
+        const blogId = createResponseBlog.body.id
+        const blog = await blogRepository.getBlogById(blogId)
+
+        const postData = await createPostData();
+        const validData = {
+            ...postData.validData,
+            title: 'created post',
+            blogId: blogId
+        }
+
+        const response = await request (app)
+            .post(`${SETTINGS.PATH.BLOGS}/${blogId}/posts`)
+            .set(authData)
+            .send(validData)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createdPost = response.body;
+        expect(createdPost).toEqual({
+            id: createdPost.id,
+            title: validData.title,
+            shortDescription: validData.shortDescription,
+            content: validData.content,
+            blogId: blogId,
+            blogName: blog!.name,
+            createdAt: createdPost.createdAt,
+        })
     })
 
     it('unauthorized user shouldn`t create blog', async () => {
