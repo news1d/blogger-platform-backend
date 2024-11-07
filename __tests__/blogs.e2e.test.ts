@@ -4,7 +4,7 @@ import {app} from "../src/app";
 import {clearDB} from "../src/db/mongoDb";
 import {HTTP_STATUSES} from "../src/helpers/http-statuses";
 import {authData, blogData, blogsTestManager, createPostData, postsTestManager} from "./test-helpers";
-import {blogRepository} from "../src/modules/blogs/blog-repository";
+import {blogQueryRepo} from "../src/modules/blogs/blog-queryRepo";
 
 
 describe('/blogs', () => {
@@ -111,7 +111,7 @@ describe('/blogs', () => {
         // Добавляем блог для проверки blogId
         const createResponseBlog = await blogsTestManager.createBlog(blogData.validData)
         const blogId = createResponseBlog.body.id
-        const blog = await blogRepository.getBlogById(blogId)
+        const blog = await blogQueryRepo.getBlogById(blogId)
 
         const postData = await createPostData();
         const validData = {

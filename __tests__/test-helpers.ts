@@ -4,8 +4,8 @@ import request from 'supertest';
 import {app} from "../src/app";
 import {SETTINGS} from "../src/settings";
 import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {blogRepository} from "../src/modules/blogs/blog-repository";
 import {blogCollection} from "../src/db/mongoDb";
+import {blogQueryRepo} from "../src/modules/blogs/blog-queryRepo";
 
 const codedAuth = 'YWRtaW46cXdlcnR5'
 export const authData = {'Authorization': 'Basic '+ codedAuth}
@@ -70,7 +70,7 @@ export const blogData = {
 
 async function getFirstDocumentId() {
     const firstDocument = await blogCollection.findOne({}, { projection: { id: 1 } });
-    return firstDocument?.id;
+    return firstDocument?._id.toString();
 }
 
 export const createPostData = async () => {
@@ -194,7 +194,7 @@ export const postsTestManager = {
             .expect(HTTP_STATUSES.CREATED_201)
 
         const createdPost = response.body;
-        const blog = await blogRepository.getBlogById(data.blogId)
+        const blog = await blogQueryRepo.getBlogById(data.blogId)
         expect(createdPost).toEqual({
             id: expect.any(String),
             title: data.title,

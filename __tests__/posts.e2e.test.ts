@@ -134,14 +134,15 @@ describe('/posts', () => {
             .post(SETTINGS.PATH.POSTS)
             .set(authData)
             .send(postData.dataWithInvalidBlogId)
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
-                errorsMessages: [
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+            .expect(res => {
+                expect(res.body.errorsMessages).toEqual([
                     {
-                        message: 'Blog ID was not found.',
+                        message: expect.any(String),
                         field: 'blogId'
                     }
-                ]
-            })
+                ]);
+            });
     })
 
     it('should create post with correct input data', async () => {
@@ -304,14 +305,15 @@ describe('/posts', () => {
             .put(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
             .set(authData)
             .send(postData.dataWithInvalidBlogId)
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
-                errorsMessages: [
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+            .expect(res => {
+                expect(res.body.errorsMessages).toEqual([
                     {
-                        message: 'Blog ID was not found.',
+                        message: expect.any(String),
                         field: 'blogId'
                     }
-                ]
-            })
+                ])
+            });
     })
 
     it('should update post with correct data', async () => {

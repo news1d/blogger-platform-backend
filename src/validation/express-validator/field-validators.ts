@@ -1,5 +1,5 @@
 import {body} from "express-validator";
-import {blogRepository} from "../../modules/blogs/blog-repository";
+import {blogQueryRepo} from "../../modules/blogs/blog-queryRepo";
 
 
 export const blogNameValidator = body('name')
@@ -60,7 +60,7 @@ export const postBlogIdValidator = body('blogId')
     .notEmpty()
     .withMessage('Please enter a blog ID.')
     .custom(async (blogId) => {
-        const blog = await blogRepository.getBlogById(blogId);
+        const blog = await blogQueryRepo.getBlogById(blogId);
         if (!blog) {
             throw new Error('Blog ID was not found.');
         }
