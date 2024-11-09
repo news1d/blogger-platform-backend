@@ -65,4 +65,42 @@ export const postBlogIdValidator = body('blogId')
             throw new Error('Blog ID was not found.');
         }
         return true;
-    })
+    });
+
+
+export const userLoginValidator = body('login')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('Please enter a login.')
+    .isLength({ min: 3, max: 10 })
+    .withMessage('Login should contain 3-10 characters.')
+    .matches(/^[a-zA-Z0-9_-]*$/)
+    .withMessage('Login must contain only letters, numbers, underscores, or hyphens')
+
+export const userPasswordValidator = body('password')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('Please enter a password.')
+    .isLength({ min: 6, max: 20 })
+    .withMessage('Password should contain 3-20 characters.')
+
+export const userEmailValidator = body('email')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('Please enter a email address.')
+    .isEmail()
+    .withMessage('Email must be a valid format')
+
+
+export const userloginOrEmailValidator = body('loginOrEmail')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('Please enter a login or email.')
+    .isLength({ min: 3 })
+    .withMessage('Login or email should contain minimum 3 characters.')
+    .matches(/^[a-zA-Z0-9@._-]*$/)
+    .withMessage('Login or email must contain only letters, numbers, underscores, hyphens, or email format characters.')
