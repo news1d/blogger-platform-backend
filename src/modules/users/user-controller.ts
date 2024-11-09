@@ -22,16 +22,21 @@ export const userController = {
             items: users
         })
     },
-    async createUser(req: Request<any, any, UserInputModel>, res: Response<UserViewModel | null | OutputErrorsType>) {
+    async createUser(req: Request<any, any, UserInputModel>, res: Response) {
         const isLoginExists = await userQueryRepo.getUserByLogin(req.body.login)
         if (isLoginExists) {
+
+            const {pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm} = userPaginationQueries(req)
+            const users = await userQueryRepo.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm)
+
             res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
                 errorsMessages: [
                     {
                         message: 'This login has already been used.',
                         field: 'login'
                     }
-                ]
+                ],
+                users
             })
             return;
         }
