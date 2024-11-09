@@ -21,8 +21,10 @@ export const userQueryRepo = {
             filter.push({ email: { $regex: searchEmailTerm, $options: "i" } })
         }
 
+        const query = filter.length > 0 ? { $or: filter } : {};
+
         const users = await userCollection
-            .find({ $or: filter })
+            .find(query)
             .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
@@ -42,7 +44,9 @@ export const userQueryRepo = {
             filter.push({ email: { $regex: searchEmailTerm, $options: "i" } });
         }
 
-        return userCollection.countDocuments({ $or: filter })
+        const query = filter.length > 0 ? { $or: filter } : {};
+
+        return userCollection.countDocuments(query)
 
     },
     async getUserById(id: string): Promise<UserViewModel | null> {
