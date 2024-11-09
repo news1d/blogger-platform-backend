@@ -58,18 +58,12 @@ export const userQueryRepo = {
         return this.mapToOutput(user)
     },
     async getUserByLogin(login: string): Promise<UserViewModel | null> {
-        console.log("Executing getUserByLogin:", login);
-
         const user = await userCollection.findOne({ login: login })
 
         if (!user) {
-            console.log("getUserByLogin: No user found for login:", login);
             return null
         }
-
-        const output = this.mapToOutput(user);
-        console.log("getUserByLogin: User found:", output); // Лог, если пользователь найден
-        return output
+        return this.mapToOutput(user)
     },
     async getUserByEmail(email: string): Promise<UserViewModel | null> {
         const user = await userCollection.findOne({email: email})
