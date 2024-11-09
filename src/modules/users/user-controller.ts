@@ -23,26 +23,21 @@ export const userController = {
         })
     },
     async createUser(req: Request<any, any, UserInputModel>, res: Response) {
+        console.log('Starting user creation with login:', req.body.login, 'and email:', req.body.email);
+
         const isLoginExists = await userQueryRepo.getUserByLogin(req.body.login)
+        console.log('Result of login check for', req.body.login, ':', isLoginExists);
+
         if (isLoginExists) {
-
-            const {pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm} = userPaginationQueries(req)
-            const users = await userQueryRepo.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm)
-
+            console.log('Login already exists, sending error response.');
             res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
+
                 errorsMessages: [
                     {
                         message: 'This login has already been used.',
                         field: 'login'
                     }
-                ],
-                users,
-                pageNumber,
-                pageSize,
-                sortBy,
-                sortDirection,
-                searchLoginTerm,
-                searchEmailTerm
+                ]
             })
             return;
         }
