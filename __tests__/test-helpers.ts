@@ -1,5 +1,6 @@
 import {BlogInputModel} from "../src/types/blog.types";
 import {PostInputModel} from "../src/types/post.types";
+import {UserInputModel} from "../src/types/user.types";
 import request from 'supertest';
 import {app} from "../src/app";
 import {SETTINGS} from "../src/settings";
@@ -203,6 +204,25 @@ export const postsTestManager = {
             blogId: data.blogId,
             blogName: blog!.name,
             createdAt: createdPost.createdAt,
+        })
+        return response;
+    }
+}
+
+export const usersTestManager = {
+    async createUser(data: UserInputModel) {
+        const response = await request(app)
+            .post(SETTINGS.PATH.USERS)
+            .set(authData)
+            .send(data)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createdUser = response.body;
+        expect(createdUser).toEqual({
+            id: expect.any(String),
+            login: data.login,
+            email: data.email,
+            createdAt: createdUser.createdAt
         })
         return response;
     }
