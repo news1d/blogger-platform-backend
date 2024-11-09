@@ -10,21 +10,24 @@ import {
 } from "../../validation/express-validator/field-validators";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {authMiddleware} from "../../middlewares/authorization-middleware";
-import {validateQueryParams} from "../../validation/express-validator/query-validators";
+import {validateBlogQueryParams} from "../../validation/express-validator/query-validators";
 
 export const blogRouter = Router();
 
-blogRouter.get('/', validateQueryParams, blogController.getBlogs);
+blogRouter.get('/', validateBlogQueryParams,
+    errorsResultMiddleware,
+    blogController.getBlogs);
 blogRouter.post('/', authMiddleware,
     blogNameValidator,
     blogDescriptionValidator,
     blogWebsiteUrlValidator,
     errorsResultMiddleware,
     blogController.createBlog);
-blogRouter.get('/:blogId/posts', validateQueryParams,
+blogRouter.get('/:blogId/posts', validateBlogQueryParams,
+    errorsResultMiddleware,
     blogController.getPostsByBlogId)
 blogRouter.post('/:blogId/posts', authMiddleware,
-    validateQueryParams,
+    validateBlogQueryParams,
     postTitleValidator,
     postShortDescriptionValidator,
     postContentValidator,

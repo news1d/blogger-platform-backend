@@ -62,7 +62,7 @@ export const postController = {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }
     },
-    async deletePostById (req: Request, res: Response) {
+    async deletePostById (req: Request<{id: string}>, res: Response) {
         if (!ObjectId.isValid(req.params.id)) {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             return;
