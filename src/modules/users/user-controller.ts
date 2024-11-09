@@ -36,7 +36,13 @@ export const userController = {
                         field: 'login'
                     }
                 ],
-                users
+                users,
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                searchLoginTerm,
+                searchEmailTerm
             })
             return;
         }
