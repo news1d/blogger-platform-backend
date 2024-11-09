@@ -2,11 +2,13 @@ import {MongoClient, Collection} from 'mongodb';
 import {SETTINGS} from "../settings";
 import {BlogDBType} from "../types/blog.types";
 import {PostDBType} from "../types/post.types";
+import {UserDBType} from "../types/user.types";
 
 const client = new MongoClient(SETTINGS.MONGO_URL);
 const db = client.db(SETTINGS.DB_NAME);
 export const blogCollection: Collection<BlogDBType> = db.collection<BlogDBType>(SETTINGS.COLLECTION_NAME.BLOG)
 export const postCollection: Collection<PostDBType> = db.collection<PostDBType>(SETTINGS.COLLECTION_NAME.POST)
+export const userCollection: Collection<UserDBType> = db.collection<UserDBType>(SETTINGS.COLLECTION_NAME.USER);
 
 export async function runDb(): Promise<boolean> {
     try {
@@ -24,4 +26,5 @@ export async function runDb(): Promise<boolean> {
 export const clearDB = async () => {
     await blogCollection.deleteMany({});
     await postCollection.deleteMany({});
+    await userCollection.deleteMany({});
 }
