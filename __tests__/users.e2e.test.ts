@@ -145,4 +145,14 @@ describe('/users', () => {
             .set(authData)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
+
+    it('should create user with correct data', async () => {
+        const user = {
+            login: 'user01',
+            password: 'qwerty1',
+            email: 'email1p@gg.cm',
+        }
+
+        await usersTestManager.createUser(user)
+    })
 })
