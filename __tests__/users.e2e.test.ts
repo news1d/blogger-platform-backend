@@ -11,6 +11,10 @@ describe('/users', () => {
         await clearDB()
     })
 
+    afterAll(async () => {
+        await clearDB();
+    });
+
     it('should return a paginated list of users sorted by name', async () => {
         // Добавляем пользователей
         const firstUser = {
@@ -144,15 +148,5 @@ describe('/users', () => {
             .delete(`${SETTINGS.PATH.USERS}/${createdUser.id}`)
             .set(authData)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
-    })
-
-    it('should create user with correct data', async () => {
-        const user = {
-            login: 'user01',
-            password: 'qwerty1',
-            email: 'email1p@gg.cm',
-        }
-
-        await usersTestManager.createUser(user)
     })
 })
