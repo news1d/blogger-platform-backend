@@ -57,22 +57,6 @@ export const userQueryRepo = {
         }
         return this.mapToOutput(user)
     },
-    async getUserByLogin(login: string): Promise<UserViewModel | null> {
-        const user = await userCollection.findOne({ login: login })
-
-        if (!user) {
-            return null
-        }
-        return this.mapToOutput(user)
-    },
-    async getUserByEmail(email: string): Promise<UserViewModel | null> {
-        const user = await userCollection.findOne({email: email})
-
-        if (!user) {
-            return null
-        }
-        return this.mapToOutput(user)
-    },
     mapToOutput(user: WithId<UserDBType>): UserViewModel {
         return {
             id: user._id.toString(),

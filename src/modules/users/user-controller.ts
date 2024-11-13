@@ -23,30 +23,10 @@ export const userController = {
         })
     },
     async createUser(req: Request<any, any, UserInputModel>, res: Response<UserViewModel | null | OutputErrorsType>) {
-        const isLoginExists = await userQueryRepo.getUserByLogin(req.body.login)
+        const uniqueChecker = await userService.checkUnique(req.body.login, req.body.email)
 
-        if (isLoginExists) {
-            res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
-                errorsMessages: [
-                    {
-                        message: 'This login has already been used.',
-                        field: 'login'
-                    }
-                ]
-            })
-            return;
-        }
-
-        const isEmailExists = await userQueryRepo.getUserByEmail(req.body.email)
-        if (isEmailExists) {
-            res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
-                errorsMessages: [
-                    {
-                        message: 'This email address has already been used.',
-                        field: 'email'
-                    }
-                ]
-            })
+        if (uniqueChecker.errorsMessages.length > 0) {
+            res.status(HTTP_STATUSES.BAD_REQUEST_400).json(uniqueChecker)
             return;
         }
 

@@ -12,6 +12,22 @@ export const userRepository = {
         const result = await userCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
     },
+    async getUserByLogin(login: string): Promise<UserDBType | null> {
+        const user = await userCollection.findOne({ login: login })
+
+        if (!user) {
+            return null
+        }
+        return user
+    },
+    async getUserByEmail(email: string): Promise<UserDBType | null> {
+        const user = await userCollection.findOne({email: email})
+
+        if (!user) {
+            return null
+        }
+        return user
+    },
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDBType | null> {
         return await userCollection.findOne({
             $or: [
