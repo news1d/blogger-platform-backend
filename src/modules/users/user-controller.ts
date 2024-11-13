@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {userPaginationQueries} from "../../helpers/paginations_values";
 import {userQueryRepo} from "./user-queryRepo";
-import {userService} from "./user-service";
+import {DomainStatusCode, userService} from "./user-service";
 import {UserInputModel, UserViewModel} from "../../types/user.types";
 import {ObjectId} from "mongodb";
 import {OutputErrorsType} from "../../types/output-errors.type";
@@ -23,14 +23,14 @@ export const userController = {
         })
     },
     async createUser(req: Request<any, any, UserInputModel>, res: Response<UserViewModel | null | OutputErrorsType>) {
-        const uniqueChecker = await userService.checkUnique(req.body.login, req.body.email)
+        const result = await userService.createUser(req.body)
 
-        if (uniqueChecker.errorsMessages.length > 0) {
-            res.status(HTTP_STATUSES.BAD_REQUEST_400).json(uniqueChecker)
+        if (result.status !== DomainStatusCode.Success) {
+            res.status(HTTP_STATUSES.BAD_REQUEST_400).json({errorsMessages: result.errorsMessages})
             return;
         }
 
-        const userId = await userService.createUser(req.body)
+        const userId = result.data!
         const user = await userQueryRepo.getUserById(userId)
 
         res.status(HTTP_STATUSES.CREATED_201).json(user)
