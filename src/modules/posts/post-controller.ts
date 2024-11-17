@@ -6,6 +6,8 @@ import {paginationQueries} from "../../helpers/paginations_values";
 import {postQueryRepo} from "./post-queryRepo";
 import {blogQueryRepo} from "../blogs/blog-queryRepo";
 import {ObjectId} from "mongodb";
+import {CommentInputModel, CommentViewModel} from "../../types/comments.types";
+import {commentQueryRepo} from "../comments/comment-queryRepo";
 
 
 export const postController = {
@@ -74,6 +76,45 @@ export const postController = {
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
         } else {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        }
+    },
+    async getCommentsByPostId (req: Request<{postId: string}>, res: Response) {
+        if (!ObjectId.isValid(req.params.postId)) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+            return;
+        }
+
+        const post = await postQueryRepo.getPostById(req.params.postId);
+
+        if (post) {
+            const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req)
+            const comments = await commentQueryRepo.getCommentsForPost(pageNumber, pageSize, sortBy, sortDirection, post.id)
+            const commentsCount = await commentQueryRepo.getCommentsCount(post.id)
+            res.status(HTTP_STATUSES.OK_200).json({
+                pagesCount: Math.ceil(commentsCount/pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: commentsCount,
+                items: comments
+            });
+        } else {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        }
+    },
+    async createCommentByPostId(req: Request<{postId: string}, any, CommentInputModel>, res: Response<CommentViewModel | null>) {
+        if (!ObjectId.isValid(req.params.postId)) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+            return;
+        }
+
+        const post = await postQueryRepo.getPostById(req.params.postId);
+
+        if (post) {
+            const commentId = await postService.createCommentByPostId(req.params.postId, req.userId!, req.body)
+            const comment = await commentQueryRepo.getCommentById(commentId)
+            res.status(HTTP_STATUSES.CREATED_201).json(comment)
+        } else {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         }
     }
 }
