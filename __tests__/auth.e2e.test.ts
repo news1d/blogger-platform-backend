@@ -3,7 +3,7 @@ import {app} from "../src/app";
 import request from "supertest";
 import {SETTINGS} from "../src/settings";
 import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {usersTestManager} from "./test-helpers";
+import {bearerAuth, usersTestManager} from "./test-helpers";
 
 
 describe('/auth', () => {
@@ -67,12 +67,47 @@ describe('/auth', () => {
         await request(app)
             .post(`${SETTINGS.PATH.AUTH}/login`)
             .send(authDataWithLogin)
-            .expect(HTTP_STATUSES.NO_CONTENT_204)
+            .expect(HTTP_STATUSES.OK_200)
 
         await request(app)
             .post(`${SETTINGS.PATH.AUTH}/login`)
             .send(authDataWithEmail)
-            .expect(HTTP_STATUSES.NO_CONTENT_204)
+            .expect(HTTP_STATUSES.OK_200)
+    })
+
+    it('should get information about user by accessToken', async () => {
+        // Добавляем пользователей
+        const userData = {
+            login: 'Zamir',
+            password: 'password1',
+            email: 'dlyagoev@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'dlyagoev@gmail.com',
+            password: 'password1',
+        }
+
+       const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        const responseWithUserInfo =  await request(app)
+            .get(`${SETTINGS.PATH.AUTH}/me`)
+            .set(bearerAuth(accessToken))
+            .expect(HTTP_STATUSES.OK_200)
+
+        const userInfo = responseWithUserInfo.body
+        expect(userInfo).toEqual({
+            email: 'dlyagoev@gmail.com',
+            login: 'Zamir',
+            userId: expect.any(String)
+        })
     })
 
 })
