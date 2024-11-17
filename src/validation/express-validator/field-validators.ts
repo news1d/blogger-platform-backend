@@ -104,3 +104,13 @@ export const userloginOrEmailValidator = body('loginOrEmail')
     .withMessage('Login or email should contain minimum 3 characters.')
     .matches(/^[a-zA-Z0-9@._-]*$/)
     .withMessage('Login or email must contain only letters, numbers, underscores, hyphens, or email format characters.')
+
+
+export const postCommentContentValidator = body('content')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('Please enter a content.')
+    .isLength({ min: 20, max: 300 })
+    .withMessage('Content should contain 20-300 characters.')
+
