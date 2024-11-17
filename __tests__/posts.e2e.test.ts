@@ -2,14 +2,14 @@ import request from "supertest";
 import {app} from "../src/app";
 import {clearDB} from "../src/db/mongoDb";
 import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {authData, createPostData, postsTestManager} from "./test-helpers";
+import {authData, bearerAuth, createPostData, postsTestManager, usersTestManager} from "./test-helpers";
 import {SETTINGS} from "../src/settings";
 
 
 describe('/posts', () => {
-    // beforeAll(async () => {
-    //    await clearDB();
-    // })
+    beforeAll(async () => {
+       await clearDB();
+    })
 
     it('unauthorized user shouldn`t create post', async () => {
         const postData = await createPostData();
@@ -353,6 +353,132 @@ describe('/posts', () => {
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
 
+    it('should create comment for post by accessToken', async () => {
+        // Добавляем пользователя
+        const userData = {
+            login: 'Damir',
+            password: 'password1',
+            email: 'doma@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'doma@gmail.com',
+            password: 'password1',
+        }
+
+        const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        // Добавляем пост
+        const postData = await createPostData();
+        const createResponse = await postsTestManager.createPost(postData.validData)
+        const createdPost = createResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdPost)
+
+        // Добавляем комментарий к посту
+        const comment = {
+            content: 'any comments any comments any comments'
+        }
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .set(bearerAuth(accessToken))
+            .send(comment)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createdComment = response.body
+        expect(createdComment).toEqual({
+            id: expect.any(String),
+            content: comment.content,
+            commentatorInfo: {
+                userId: expect.any(String),
+                userLogin: userData.login,
+            },
+            createdAt: expect.any(String)
+        })
+    })
+
+    it('should return all comments for post', async () => {
+        // Добавляем пользователя
+        const userData = {
+            login: 'Doma',
+            password: 'password1',
+            email: 'Roma229@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'Doma',
+            password: 'password1',
+        }
+
+        const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        // Добавляем пост
+        const postData = await createPostData();
+        const createResponse = await postsTestManager.createPost(postData.validData)
+        const createdPost = createResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdPost)
+
+        // Добавляем комментарии к посту
+        const firstComment = {
+            content: 'first comment first comment first comment'
+        }
+
+        const secondComment = {
+            content: 'second comment second comment second comment'
+        }
+
+        const firstCreatedResponse = await request(app)
+            .post(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .set(bearerAuth(accessToken))
+            .send(firstComment)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const secondCreatedResponse = await request(app)
+            .post(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .set(bearerAuth(accessToken))
+            .send(secondComment)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const firstCreatedBlog = firstCreatedResponse.body
+        const secondCreatedBlog = secondCreatedResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .query({
+                pageSize: 5,
+                pageNumber: 1,
+                sortDirection: 'asc',
+                sortBy: 'content',
+            })
+            .expect(HTTP_STATUSES.OK_200, {
+                pagesCount: 1,
+                page: 1,
+                pageSize: 5,
+                totalCount: 2,
+                items: [firstCreatedBlog, secondCreatedBlog]
+            })
+    })
+
     it('should return 204 and empty array', async () => {
         await request(app)
             .delete(`${SETTINGS.PATH.TESTING}/all-data`)
@@ -362,5 +488,6 @@ describe('/posts', () => {
             .get(SETTINGS.PATH.POSTS)
             .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     })
+
 
 })
