@@ -5,11 +5,14 @@ import request from 'supertest';
 import {app} from "../src/app";
 import {SETTINGS} from "../src/settings";
 import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {blogCollection} from "../src/db/mongoDb";
 import {blogQueryRepo} from "../src/modules/blogs/blog-queryRepo";
 
 const codedAuth = 'YWRtaW46cXdlcnR5'
 export const authData = {'Authorization': 'Basic '+ codedAuth}
+
+export const bearerAuth = (accessToken: string)=> {
+    return {'Authorization': 'Bearer '+ accessToken}
+}
 
 export const blogData = {
     validData: {
@@ -69,13 +72,10 @@ export const blogData = {
     }
 }
 
-async function getFirstDocumentId() {
-    const firstDocument = await blogCollection.findOne({}, { projection: { id: 1 } });
-    return firstDocument?._id.toString();
-}
 
 export const createPostData = async () => {
-    const blogId = await getFirstDocumentId(); // Дождитесь получения blogId
+    const createResponseBlog = await blogsTestManager.createBlog(blogData.validData)
+    const blogId = createResponseBlog.body.id
 
     if (!blogId) {
         throw new Error('blogId must be defined'); // выбросить ошибку, если blogId равен undefined
