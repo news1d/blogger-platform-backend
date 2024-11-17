@@ -1,9 +1,9 @@
 import {Router} from "express";
 import {postController} from "./post-controller";
-import {authMiddleware} from "../../middlewares/authorization-middleware";
+import {accessTokenMiddleware, authMiddleware} from "../../middlewares/authorization-middleware";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {
-    postBlogIdValidator,
+    postBlogIdValidator, postCommentContentValidator,
     postContentValidator,
     postShortDescriptionValidator,
     postTitleValidator
@@ -29,3 +29,9 @@ postRouter.put('/:id', authMiddleware,
     postController.updatePostById);
 postRouter.delete('/:id', authMiddleware,
     postController.deletePostById);
+
+postRouter.get('/:postId/comments', postController.getCommentsByPostId)
+postRouter.post('/:postId/comments', accessTokenMiddleware,
+    postCommentContentValidator,
+    errorsResultMiddleware,
+    postController.createCommentByPostId)
