@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import {UserDBType, UserInputModel} from "../../types/user.types";
 import {userRepository} from "./user-repository";
 import {OutputErrorsType} from "../../types/output-errors.type";
+import {WithId} from "mongodb";
 
 export type Result<Data> = {
     status: DomainStatusCode,
@@ -42,17 +43,25 @@ export const userService = {
             errorsMessages: []
         }
     },
+    async getUserById(userId: string): Promise<WithId<UserDBType> | null> {
+        return userRepository.getUserById(userId)
+    },
     async deleteUserById(id: string): Promise<boolean> {
         return await userRepository.deleteUserById(id)
     },
-    async checkCredentials(loginOrEmail: string, password: string): Promise<boolean> {
+    async checkCredentials(loginOrEmail: string, password: string): Promise<string | null> {
         const user = await userRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) {
-            return false;
+            return null;
         }
 
         const passwordHash = await this._generateHash(password, user.passwordSalt);
-        return user.passwordHash === passwordHash;
+
+        if (user.passwordHash === passwordHash) {
+            return user._id.toString()
+        } else {
+            return null
+        }
     },
     async checkUnique(login: string, email: string): Promise<Result<string | null>> {
         const isLoginExists = await userRepository.getUserByLogin(login)
