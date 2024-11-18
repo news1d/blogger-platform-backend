@@ -236,10 +236,10 @@ describe('comments', () => {
             .expect(HTTP_STATUSES.OK_200, createdComment)
 
         const dataForUpdate = {
-            content: 'not today????'
+            content: 'not today not today not today not today'
         }
 
-        // Обноволяем комментарий по id
+        // Обновляем комментарий по id
         await request(app)
             .put(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}`)
             .set(bearerAuth(accessToken))
@@ -250,7 +250,74 @@ describe('comments', () => {
             .get(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}`)
             .expect(HTTP_STATUSES.OK_200, {
                 ...createdComment,
-                content: 'not today????'
+                content: 'not today not today not today not today'
+            })
+    })
+
+    it('shouldn`t update comment with incorrect data', async () => {
+        // Добавляем пользователя
+        const userData = {
+            login: 'maverick',
+            password: 'password1',
+            email: 'maverick@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'maverick@gmail.com',
+            password: 'password1',
+        }
+
+        const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        // Добавляем пост
+        const postData = await createPostData();
+        const createResponse = await postsTestManager.createPost(postData.validData)
+        const createdPost = createResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdPost)
+
+        // Добавляем комментарий к посту
+        const comment = {
+            content: 'buy buy buy buy buy buy'
+        }
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .set(bearerAuth(accessToken))
+            .send(comment)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createdComment = response.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdComment)
+
+        const dataForUpdate = {
+            content: 'short'
+        }
+
+        // Обновляем комментарий по id
+        await request(app)
+            .put(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}`)
+            .set(bearerAuth(accessToken))
+            .send(dataForUpdate)
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'Content should contain 20-300 characters.',
+                        field: 'content'
+                    }
+                ]
             })
     })
 })
