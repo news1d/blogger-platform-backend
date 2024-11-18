@@ -33,6 +33,8 @@ export const userController = {
         const userId = result.data!
         const user = await userQueryRepo.getUserById(userId)
 
+        console.log('createdUser: ', user)
+
         res.status(HTTP_STATUSES.CREATED_201).json(user)
     },
     async deleteUserById(req: Request<{id: string}>, res: Response) {
