@@ -30,6 +30,11 @@ export const commentController = {
 
         const isOwner = await commentService.ownerVerification(req.params.commentId, req.userId!);
 
+        if (isOwner === null) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+            return;
+        }
+
         if (!isOwner) {
             res.sendStatus(HTTP_STATUSES.FORBIDDEN_403);
             return;
@@ -50,6 +55,11 @@ export const commentController = {
         }
 
         const isOwner = await commentService.ownerVerification(req.params.commentId, req.userId!);
+
+        if (isOwner === null) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+            return;
+        }
 
         if (!isOwner) {
             res.sendStatus(HTTP_STATUSES.FORBIDDEN_403);
