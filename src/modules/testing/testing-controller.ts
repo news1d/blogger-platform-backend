@@ -3,8 +3,8 @@ import {testingRepository} from "./testing-repository";
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 
 export const testingController = {
-    deleteAllData (req: Request, res: Response) {
-        testingRepository.clearDB()
+    async deleteAllData (req: Request, res: Response) {
+        await testingRepository.clearDB()
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 }
