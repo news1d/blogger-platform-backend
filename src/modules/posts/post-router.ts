@@ -3,7 +3,7 @@ import {postController} from "./post-controller";
 import {accessTokenMiddleware, authMiddleware} from "../../middlewares/authorization-middleware";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {
-    postBlogIdValidator, postCommentContentValidator,
+    postBlogIdValidator, commentContentValidator,
     postContentValidator,
     postShortDescriptionValidator,
     postTitleValidator
@@ -32,6 +32,6 @@ postRouter.delete('/:id', authMiddleware,
 
 postRouter.get('/:postId/comments', postController.getCommentsByPostId)
 postRouter.post('/:postId/comments', accessTokenMiddleware,
-    postCommentContentValidator,
+    commentContentValidator,
     errorsResultMiddleware,
     postController.createCommentByPostId)

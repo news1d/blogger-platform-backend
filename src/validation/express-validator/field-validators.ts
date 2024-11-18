@@ -106,7 +106,7 @@ export const userloginOrEmailValidator = body('loginOrEmail')
     .withMessage('Login or email must contain only letters, numbers, underscores, hyphens, or email format characters.')
 
 
-export const postCommentContentValidator = body('content')
+export const commentContentValidator = body('content')
     .trim()
     .isString()
     .notEmpty()
