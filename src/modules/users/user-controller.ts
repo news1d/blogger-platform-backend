@@ -14,6 +14,8 @@ export const userController = {
         const users = await userQueryRepo.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm)
         const usersCount = await userQueryRepo.getUsersCount(searchLoginTerm, searchEmailTerm)
 
+        console.log('users: ', users)
+
         res.status(HTTP_STATUSES.OK_200).json({
             pagesCount: Math.ceil(usersCount/pageSize),
             page: pageNumber,
