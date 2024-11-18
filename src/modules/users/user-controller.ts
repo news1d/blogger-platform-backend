@@ -14,8 +14,6 @@ export const userController = {
         const users = await userQueryRepo.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm)
         const usersCount = await userQueryRepo.getUsersCount(searchLoginTerm, searchEmailTerm)
 
-        console.log('users: ', users)
-
         res.status(HTTP_STATUSES.OK_200).json({
             pagesCount: Math.ceil(usersCount/pageSize),
             page: pageNumber,
@@ -34,8 +32,6 @@ export const userController = {
 
         const userId = result.data!
         const user = await userQueryRepo.getUserById(userId)
-
-        console.log('createdUser: ', user)
 
         res.status(HTTP_STATUSES.CREATED_201).json(user)
     },
