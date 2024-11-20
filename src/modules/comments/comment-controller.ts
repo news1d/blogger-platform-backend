@@ -3,6 +3,7 @@ import {commentService} from "./comment-service";
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {CommentInputModel, CommentViewModel} from "../../types/comments.types";
 import {commentQueryRepo} from "./comment-queryRepo";
+import {DomainStatusCode} from "../../helpers/domain_status_code";
 
 
 export const commentController = {
@@ -17,45 +18,37 @@ export const commentController = {
         res.status(HTTP_STATUSES.OK_200).json(comment);
     },
     async updateCommentById(req: Request<{commentId: string}, any, CommentInputModel>, res: Response) {
-        const isOwner = await commentService.ownerVerification(req.params.commentId, req.userId!);
+        const result = await commentService.updateCommentById(req.params.commentId, req.userId!, req.body)
 
-        if (isOwner === null) {
+        if (result.status === DomainStatusCode.NotFound){
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
             return;
         }
 
-        if (!isOwner) {
+        if (result.status === DomainStatusCode.Forbidden){
             res.sendStatus(HTTP_STATUSES.FORBIDDEN_403);
             return;
         }
 
-        const isUpdated = await commentService.updateCommentById(req.params.commentId, req.body)
-
-        if (isUpdated) {
+        if (result.status === DomainStatusCode.Success) {
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
-        } else {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }
     },
     async deleteCommentById(req: Request<{commentId: string}>, res: Response) {
-        const isOwner = await commentService.ownerVerification(req.params.commentId, req.userId!);
+        const result = await commentService.deleteCommentById(req.params.commentId, req.userId!)
 
-        if (isOwner === null) {
+        if (result.status === DomainStatusCode.NotFound){
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
             return;
         }
 
-        if (!isOwner) {
+        if (result.status === DomainStatusCode.Forbidden){
             res.sendStatus(HTTP_STATUSES.FORBIDDEN_403);
             return;
         }
 
-        const isDeleted = await commentService.deleteCommentById(req.params.commentId)
-
-        if (isDeleted) {
-            res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-        } else {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        if (result.status === DomainStatusCode.Success) {
+            res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
         }
     }
 }
