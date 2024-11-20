@@ -3,5 +3,5 @@ import {DomainStatusCode} from "../helpers/domain-status-code";
 
 export type Result<Data> = {
     status: DomainStatusCode,
-    data: Data,
+    data: Data | null,
 } & OutputErrorsType
