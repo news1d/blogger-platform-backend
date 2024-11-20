@@ -1,21 +1,9 @@
 import bcrypt from 'bcrypt'
 import {UserDBType, UserInputModel} from "../../types/user.types";
 import {userRepository} from "./user-repository";
-import {OutputErrorsType} from "../../types/output-errors.type";
 import {WithId} from "mongodb";
-
-export type Result<Data> = {
-    status: DomainStatusCode,
-    data: Data,
-} & OutputErrorsType
-
-export enum DomainStatusCode {
-    Success = 0,
-    NotFound = 1,
-    Forbidden = 2,
-    Unauthorized = 3,
-    BadRequest = 4
-}
+import {Result} from "../../types/result.types";
+import {DomainStatusCode} from "../../helpers/domain_status_code";
 
 export const userService = {
     async createUser(body: UserInputModel): Promise<Result<string | null>>{
