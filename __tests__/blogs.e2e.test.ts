@@ -104,7 +104,14 @@ describe('/blogs', () => {
     it('shouldn`t return posts for incorrect blogId', async () => {
             await request(app)
             .get(`${SETTINGS.PATH.BLOGS}/-1/posts`)
-            .expect(HTTP_STATUSES.NOT_FOUND_404)
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                    errorsMessages: [
+                        {
+                            message: 'Invalid BlogID format.',
+                            field: 'blogId'
+                        }
+                    ]
+                })
     })
 
     it('should create post for correct blogId', async () => {
@@ -266,7 +273,7 @@ describe('/blogs', () => {
 
     it('should return 404 cuz id incorrect', async () => {
         await request(app)
-            .get(`${SETTINGS.PATH.BLOGS}/-1`)
+            .get(`${SETTINGS.PATH.BLOGS}/60e3b72b8f1b2c6d88a6f68e`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
@@ -449,6 +456,13 @@ describe('/blogs', () => {
         await request(app)
             .delete(`${SETTINGS.PATH.BLOGS}/-1`)
             .set(authData)
-            .expect(HTTP_STATUSES.NOT_FOUND_404)
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'Invalid ID format.',
+                        field: 'id'
+                    }
+                ]
+            })
     })
 })

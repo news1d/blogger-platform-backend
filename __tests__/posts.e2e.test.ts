@@ -159,7 +159,14 @@ describe('/posts', () => {
     it('should return 404 cuz id incorrect', async () => {
         await request(app)
             .get(`${SETTINGS.PATH.POSTS}/-1`)
-            .expect(HTTP_STATUSES.NOT_FOUND_404)
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'Invalid ID format.',
+                        field: 'id'
+                    }
+                ]
+            })
     })
 
     it('unauthorized user shouldn`t update post', async () => {
