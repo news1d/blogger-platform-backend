@@ -4,6 +4,7 @@ import {userRepository} from "./user-repository";
 import {WithId} from "mongodb";
 import {Result} from "../../types/result.types";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
+import {createResult} from "../../helpers/result-function";
 
 export const userService = {
     async createUser(body: UserInputModel): Promise<Result<string | null>>{
@@ -25,11 +26,8 @@ export const userService = {
         }
 
         const createdId = await userRepository.createUser(user)
-        return {
-            status: DomainStatusCode.Success,
-            data: createdId,
-            errorsMessages: []
-        }
+
+        return createResult(DomainStatusCode.Success, createdId)
     },
     async getUserById(userId: string): Promise<WithId<UserDBType> | null> {
         return userRepository.getUserById(userId)
@@ -56,32 +54,14 @@ export const userService = {
         const isEmailExists = await userRepository.getUserByEmail(email)
 
         if (isLoginExists) {
-            return {
-                status: DomainStatusCode.BadRequest,
-                data: null,
-                errorsMessages: [{
-                    message: 'This login has already been used.',
-                    field: 'login'
-                }]
-            }
+            return createResult(DomainStatusCode.BadRequest, null, [{message: 'This login has already been used.', field: 'login'}])
         }
 
         if (isEmailExists) {
-            return {
-                status: DomainStatusCode.BadRequest,
-                data: null,
-                errorsMessages: [{
-                    message: 'This email address has already been used.',
-                    field: 'email'
-                }]
-            }
+            return createResult(DomainStatusCode.BadRequest, null, [{message: 'This email address has already been used.', field: 'email'}])
         }
 
-        return {
-            status: DomainStatusCode.Success,
-            data: null,
-            errorsMessages: []
-        }
+        return createResult(DomainStatusCode.Success)
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);

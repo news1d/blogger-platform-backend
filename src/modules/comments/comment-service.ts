@@ -2,6 +2,7 @@ import {commentRepository} from "./comment-repository";
 import {CommentInputModel} from "../../types/comments.types";
 import {Result} from "../../types/result.types";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
+import {createResult} from "../../helpers/result-function";
 
 
 export const commentService = {
@@ -15,41 +16,21 @@ export const commentService = {
         const isUpdated = await commentRepository.updateCommentById(commentId, body);
 
         if (isUpdated ) {
-            return {
-                status: DomainStatusCode.Success,
-                data: null,
-                errorsMessages: []
-            }
+            return createResult(DomainStatusCode.Success)
         } else {
-                return {
-                    status: DomainStatusCode.NotFound,
-                    data: null,
-                    errorsMessages: []
-                }
+            return createResult(DomainStatusCode.NotFound)
         }
     },
     async ownerVerification(commentId: string, userId: string): Promise<Result<null>> {
         const receivedUserId = await commentRepository.getUserIdByCommentId(commentId)
         if (receivedUserId === null) {
-            return {
-                status: DomainStatusCode.NotFound,
-                data: null,
-                errorsMessages: []
-            };
+            return createResult(DomainStatusCode.NotFound)
         }
 
         if (receivedUserId === userId) {
-            return {
-                status: DomainStatusCode.Success,
-                data: null,
-                errorsMessages: []
-            }
+            return createResult(DomainStatusCode.Success)
         } else {
-            return {
-                status: DomainStatusCode.Forbidden,
-                data: null,
-                errorsMessages: []
-            }
+            return createResult(DomainStatusCode.Forbidden)
         }
     },
     async deleteCommentById(commentId: string, userId: string): Promise<Result<null>> {
@@ -62,17 +43,9 @@ export const commentService = {
         const isDeleted = await commentRepository.deleteCommentById(commentId)
 
         if (isDeleted ) {
-            return {
-                status: DomainStatusCode.Success,
-                data: null,
-                errorsMessages: []
-            }
+            return createResult(DomainStatusCode.Success)
         } else {
-            return {
-                status: DomainStatusCode.NotFound,
-                data: null,
-                errorsMessages: []
-            }
+            return createResult(DomainStatusCode.NotFound)
         }
     }
 }
