@@ -6,7 +6,7 @@ import {
     postBlogIdValidator, commentContentValidator,
     postContentValidator,
     postShortDescriptionValidator,
-    postTitleValidator
+    postTitleValidator, idValidator, postIdValidator
 } from "../../validation/express-validator/field-validators";
 
 export const postRouter = Router();
@@ -19,8 +19,12 @@ postRouter.post('/', authMiddleware,
     postBlogIdValidator,
     errorsResultMiddleware,
     postController.createPost);
-postRouter.get('/:id', postController.getPostById);
+postRouter.get('/:id',
+    idValidator,
+    errorsResultMiddleware,
+    postController.getPostById);
 postRouter.put('/:id', authMiddleware,
+    idValidator,
     postTitleValidator,
     postShortDescriptionValidator,
     postContentValidator,
@@ -28,10 +32,16 @@ postRouter.put('/:id', authMiddleware,
     errorsResultMiddleware,
     postController.updatePostById);
 postRouter.delete('/:id', authMiddleware,
+    idValidator,
+    errorsResultMiddleware,
     postController.deletePostById);
 
-postRouter.get('/:postId/comments', postController.getCommentsByPostId)
+postRouter.get('/:postId/comments',
+    postIdValidator,
+    errorsResultMiddleware,
+    postController.getCommentsByPostId)
 postRouter.post('/:postId/comments', accessTokenMiddleware,
+    postIdValidator,
     commentContentValidator,
     errorsResultMiddleware,
     postController.createCommentByPostId)
