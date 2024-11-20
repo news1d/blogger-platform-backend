@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {PostInputModel, PostViewModel} from "../../types/post.types"
 import {postService} from "./post-service";
-import {paginationQueries} from "../../helpers/paginations_values";
+import {paginationQueries} from "../../helpers/paginations-values";
 import {postQueryRepo} from "./post-queryRepo";
 import {blogQueryRepo} from "../blogs/blog-queryRepo";
 import {CommentInputModel, CommentViewModel} from "../../types/comments.types";

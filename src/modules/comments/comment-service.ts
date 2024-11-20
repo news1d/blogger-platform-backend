@@ -1,7 +1,7 @@
 import {commentRepository} from "./comment-repository";
 import {CommentInputModel} from "../../types/comments.types";
 import {Result} from "../../types/result.types";
-import {DomainStatusCode} from "../../helpers/domain_status_code";
+import {DomainStatusCode} from "../../helpers/domain-status-code";
 
 
 export const commentService = {

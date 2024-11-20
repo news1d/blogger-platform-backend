@@ -3,7 +3,7 @@ import {UserDBType, UserInputModel} from "../../types/user.types";
 import {userRepository} from "./user-repository";
 import {WithId} from "mongodb";
 import {Result} from "../../types/result.types";
-import {DomainStatusCode} from "../../helpers/domain_status_code";
+import {DomainStatusCode} from "../../helpers/domain-status-code";
 
 export const userService = {
     async createUser(body: UserInputModel): Promise<Result<string | null>>{

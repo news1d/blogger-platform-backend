@@ -3,7 +3,7 @@ import {commentService} from "./comment-service";
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {CommentInputModel, CommentViewModel} from "../../types/comments.types";
 import {commentQueryRepo} from "./comment-queryRepo";
-import {DomainStatusCode} from "../../helpers/domain_status_code";
+import {DomainStatusCode} from "../../helpers/domain-status-code";
 
 
 export const commentController = {

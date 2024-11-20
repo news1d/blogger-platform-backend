@@ -1,11 +1,11 @@
 import {Request, Response} from 'express';
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
-import {userPaginationQueries} from "../../helpers/paginations_values";
+import {userPaginationQueries} from "../../helpers/paginations-values";
 import {userQueryRepo} from "./user-queryRepo";
 import {UserInputModel, UserViewModel} from "../../types/user.types";
 import {OutputErrorsType} from "../../types/output-errors.type";
 import {userService} from "./user-service";
-import {DomainStatusCode} from "../../helpers/domain_status_code";
+import {DomainStatusCode} from "../../helpers/domain-status-code";
 
 
 export const userController = {
