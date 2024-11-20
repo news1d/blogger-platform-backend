@@ -3,16 +3,10 @@ import {commentService} from "./comment-service";
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {CommentInputModel, CommentViewModel} from "../../types/comments.types";
 import {commentQueryRepo} from "./comment-queryRepo";
-import {ObjectId} from "mongodb";
 
 
 export const commentController = {
     async getCommentById(req: Request<{id: string}>, res: Response<CommentViewModel>) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const comment = await commentQueryRepo.getCommentById(req.params.id);
 
         if (!comment) {
@@ -23,11 +17,6 @@ export const commentController = {
         res.status(HTTP_STATUSES.OK_200).json(comment);
     },
     async updateCommentById(req: Request<{commentId: string}, any, CommentInputModel>, res: Response) {
-        if (!ObjectId.isValid(req.params.commentId)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const isOwner = await commentService.ownerVerification(req.params.commentId, req.userId!);
 
         if (isOwner === null) {
@@ -49,11 +38,6 @@ export const commentController = {
         }
     },
     async deleteCommentById(req: Request<{commentId: string}>, res: Response) {
-        if (!ObjectId.isValid(req.params.commentId)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const isOwner = await commentService.ownerVerification(req.params.commentId, req.userId!);
 
         if (isOwner === null) {

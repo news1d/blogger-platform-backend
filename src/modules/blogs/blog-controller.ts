@@ -6,7 +6,6 @@ import {paginationQueries} from "../../helpers/paginations_values";
 import {PostInputModel, PostViewModel} from "../../types/post.types";
 import {blogQueryRepo} from "./blog-queryRepo";
 import {postQueryRepo} from "../posts/post-queryRepo";
-import {ObjectId} from "mongodb";
 
 
 export const blogController = {
@@ -30,11 +29,6 @@ export const blogController = {
         res.status(HTTP_STATUSES.CREATED_201).json(blog);
     },
     async getPostsByBlogId (req: Request<{blogId: string}>, res: Response) {
-        if (!ObjectId.isValid(req.params.blogId)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
-        }
-
         const blogId = req.params.blogId
         const blog = await blogQueryRepo.getBlogById(blogId);
 
@@ -54,11 +48,6 @@ export const blogController = {
         }
     },
     async createPostByBlogId(req: Request<{blogId: string}, any, Omit<PostInputModel, 'blogId'>>, res: Response<PostViewModel | null>) {
-        if (!ObjectId.isValid(req.params.blogId)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
-        }
-
         const blog = await blogQueryRepo.getBlogById(req.params.blogId);
 
         if (blog) {
@@ -71,11 +60,6 @@ export const blogController = {
         }
     },
     async getBlogById (req: Request<{id: string}>, res: Response<BlogViewModel>) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
-        }
-
         const blog = await blogQueryRepo.getBlogById(req.params.id);
 
         if (blog) {
@@ -85,11 +69,6 @@ export const blogController = {
         }
     },
     async updateBlogById (req: Request<{id: string}, any, BlogInputModel>, res: Response) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
-        }
-
         const isUpdated = await blogService.updateBlogById(req.params.id, req.body);
 
         if (isUpdated){
@@ -99,11 +78,6 @@ export const blogController = {
         }
     },
     async deleteBlogById (req: Request<{id: string}>, res: Response) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const isDeleted = await blogService.deleteBlogById(req.params.id);
 
         if (isDeleted) {

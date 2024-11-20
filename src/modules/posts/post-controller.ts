@@ -5,7 +5,6 @@ import {postService} from "./post-service";
 import {paginationQueries} from "../../helpers/paginations_values";
 import {postQueryRepo} from "./post-queryRepo";
 import {blogQueryRepo} from "../blogs/blog-queryRepo";
-import {ObjectId} from "mongodb";
 import {CommentInputModel, CommentViewModel} from "../../types/comments.types";
 import {commentQueryRepo} from "../comments/comment-queryRepo";
 
@@ -34,11 +33,6 @@ export const postController = {
         res.status(HTTP_STATUSES.CREATED_201).json(post);
     },
     async getPostById (req: Request<{id: string}>, res: Response<PostViewModel>) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const post = await postQueryRepo.getPostById(req.params.id);
 
         if (post) {
@@ -48,11 +42,6 @@ export const postController = {
         }
     },
     async updatePostById (req: Request<{id: string}, any, PostInputModel>, res: Response) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const blog = await blogQueryRepo.getBlogById(req.body.blogId)
         const blogName = blog!.name
 
@@ -65,11 +54,6 @@ export const postController = {
         }
     },
     async deletePostById (req: Request<{id: string}>, res: Response) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const isDeleted = await postService.deletePostById(req.params.id);
 
         if (isDeleted) {
@@ -79,11 +63,6 @@ export const postController = {
         }
     },
     async getCommentsByPostId (req: Request<{postId: string}>, res: Response) {
-        if (!ObjectId.isValid(req.params.postId)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const post = await postQueryRepo.getPostById(req.params.postId);
 
         if (post) {
@@ -102,11 +81,6 @@ export const postController = {
         }
     },
     async createCommentByPostId(req: Request<{postId: string}, any, CommentInputModel>, res: Response<CommentViewModel | null>) {
-        if (!ObjectId.isValid(req.params.postId)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const post = await postQueryRepo.getPostById(req.params.postId);
 
         if (post) {

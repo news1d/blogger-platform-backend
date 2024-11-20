@@ -2,10 +2,10 @@ import {Request, Response} from 'express';
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {userPaginationQueries} from "../../helpers/paginations_values";
 import {userQueryRepo} from "./user-queryRepo";
-import {DomainStatusCode, userService} from "./user-service";
 import {UserInputModel, UserViewModel} from "../../types/user.types";
-import {ObjectId} from "mongodb";
 import {OutputErrorsType} from "../../types/output-errors.type";
+import {userService} from "./user-service";
+import {DomainStatusCode} from "../../helpers/domain_status_code";
 
 
 export const userController = {
@@ -36,11 +36,6 @@ export const userController = {
         res.status(HTTP_STATUSES.CREATED_201).json(user)
     },
     async deleteUserById(req: Request<{id: string}>, res: Response) {
-        if (!ObjectId.isValid(req.params.id)) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-            return;
-        }
-
         const isDeleted = await userService.deleteUserById(req.params.id)
 
         if (isDeleted) {
