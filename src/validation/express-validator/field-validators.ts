@@ -1,6 +1,14 @@
-import {body} from "express-validator";
+import {body, param} from "express-validator";
 import {blogQueryRepo} from "../../modules/blogs/blog-queryRepo";
 
+
+export const idValidator = param('id')
+        .isMongoId()
+        .withMessage('Invalid ID format.')
+
+export const blogIdValidator = param('blogId')
+    .isMongoId()
+    .withMessage('Invalid BlogID format.')
 
 export const blogNameValidator = body('name')
     .trim()
@@ -29,6 +37,9 @@ export const blogWebsiteUrlValidator = body('websiteUrl')
     .withMessage('Please enter a valid Website URL.');
 
 
+export const postIdValidator = param('postId')
+    .isMongoId()
+    .withMessage('Invalid PostID format.')
 
 export const postTitleValidator = body('title')
     .trim()
@@ -105,6 +116,10 @@ export const userloginOrEmailValidator = body('loginOrEmail')
     .matches(/^[a-zA-Z0-9@._-]*$/)
     .withMessage('Login or email must contain only letters, numbers, underscores, hyphens, or email format characters.')
 
+
+export const commentIdValidator = param('commentId')
+    .isMongoId()
+    .withMessage('Invalid CommentID format.')
 
 export const commentContentValidator = body('content')
     .trim()
