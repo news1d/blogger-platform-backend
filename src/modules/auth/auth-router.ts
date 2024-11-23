@@ -1,6 +1,11 @@
 import {Router} from "express";
 import {authController} from "./auth-controller";
-import {userloginOrEmailValidator, userPasswordValidator} from "../../validation/express-validator/field-validators";
+import {
+    userEmailValidator,
+    userloginOrEmailValidator,
+    userLoginValidator,
+    userPasswordValidator
+} from "../../validation/express-validator/field-validators";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {accessTokenMiddleware} from "../../middlewares/authorization-middleware";
 
@@ -11,5 +16,16 @@ authRouter.post('/login', userloginOrEmailValidator,
     userPasswordValidator,
     errorsResultMiddleware,
     authController.authentication)
+authRouter.post('/registration-confirmation',
+    authController.registerConfirmation)
+authRouter.post('/registration',
+    userLoginValidator,
+    userPasswordValidator,
+    userEmailValidator,
+    errorsResultMiddleware,
+    authController.registration)
+authRouter.post('/registration-email-resending',
+    userEmailValidator,
+    authController.registerEmailResending)
 authRouter.get('/me', accessTokenMiddleware,
-    authController.getMyInfo)
+    authController.getUserInfo)
