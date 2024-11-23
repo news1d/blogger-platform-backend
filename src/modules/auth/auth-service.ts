@@ -71,15 +71,19 @@ export const authService = {
     async registerEmailResending(email: string) {
         const user = await userRepository.getUserByEmail(email);
 
-        if (user!.emailConfirmation.isConfirmed === 'confirmed') {
+        if (!user) {
+            return createResult(DomainStatusCode.BadRequest, null, [{ message: 'The user does not exist.', field: 'email' }])
+        }
+
+        if (user.emailConfirmation.isConfirmed === 'confirmed') {
             return createResult(DomainStatusCode.BadRequest, null, [{ message: 'Email is already confirmed.', field: 'email' }])
         }
 
         const newCode = randomUUID().toString()
         const newExpirationDate = add(new Date(), { minutes: 5 })
 
-        await userRepository.updateConfirmationCode(user!._id.toString(), newCode, newExpirationDate)
-        const updatedUser = await userRepository.getUserById(user!._id.toString())
+        await userRepository.updateConfirmationCode(user._id.toString(), newCode, newExpirationDate)
+        const updatedUser = await userRepository.getUserById(user._id.toString())
 
         nodemailerService.sendEmail(updatedUser!.email, updatedUser!.emailConfirmation.confirmationCode!, emailExamples.registrationEmail)
             .catch(er => console.error('Error in send email:', er));
