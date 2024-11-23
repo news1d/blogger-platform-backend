@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 import {UserDBType, UserInputModel} from "../../types/user.types";
 import {userRepository} from "./user-repository";
-import {WithId} from "mongodb";
 import {Result} from "../../types/result.types";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
 import {createResult} from "../../helpers/result-function";
@@ -22,15 +21,17 @@ export const userService = {
             email: body.email,
             passwordHash: passwordHash,
             passwordSalt: passwordSalt,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            emailConfirmation: {
+                confirmationCode: null,
+                expirationDate: null,
+                isConfirmed: 'confirmed',
+            }
         }
 
         const createdId = await userRepository.createUser(user)
 
         return createResult(DomainStatusCode.Success, createdId)
-    },
-    async getUserById(userId: string): Promise<WithId<UserDBType> | null> {
-        return userRepository.getUserById(userId)
     },
     async deleteUserById(id: string): Promise<boolean> {
         return await userRepository.deleteUserById(id)
@@ -38,6 +39,10 @@ export const userService = {
     async checkCredentials(loginOrEmail: string, password: string): Promise<string | null> {
         const user = await userRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) {
+            return null;
+        }
+
+        if (user.emailConfirmation.isConfirmed !== 'confirmed') {
             return null;
         }
 
