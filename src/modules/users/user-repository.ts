@@ -29,8 +29,8 @@ export const userRepository = {
         }
         return user
     },
-    async getUserByEmail(email: string): Promise<UserDBType | null> {
-        const user = await userCollection.findOne({email: email})
+    async getUserByEmail(email: string): Promise<WithId<UserDBType> | null> {
+        const user = await userCollection.findOne({ email: email })
 
         if (!user) {
             return null
@@ -44,5 +44,22 @@ export const userRepository = {
                 { email: loginOrEmail }
             ]
         });
+    },
+    async findUserByConfirmationCode(code: string): Promise<WithId<UserDBType> | null> {
+        return await userCollection.findOne({ "emailConfirmation.confirmationCode": code })
+    },
+    async updateConfirmation(userId: string): Promise<boolean> {
+        const result = await userCollection.updateOne({_id: new ObjectId(userId)}, {$set: {
+            "emailConfirmation.isConfirmed": 'confirmed',
+            }})
+
+        return result.matchedCount === 1;
+    },
+    async updateConfirmationCode(userId: string, newCode: string, newExpirationDate: Date): Promise<boolean> {
+        const result = await userCollection.updateOne({_id: new ObjectId(userId)}, {$set: {
+            "emailConfirmation.confirmationCode": newCode,
+            "emailConfirmation.expirationDate": newExpirationDate
+            }})
+        return result.matchedCount === 1;
     }
 }
