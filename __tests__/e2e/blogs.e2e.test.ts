@@ -1,10 +1,10 @@
 import request from 'supertest';
-import {SETTINGS} from '../src/settings'
-import {app} from "../src/app";
-import {clearDB} from "../src/db/mongoDb";
-import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {authData, blogData, blogsTestManager, createPostData, postsTestManager} from "./test-helpers";
-import {blogQueryRepo} from "../src/modules/blogs/blog-queryRepo";
+import {SETTINGS} from '../../src/settings'
+import {app} from "../../src/app";
+import {clearDB} from "../../src/db/mongoDb";
+import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
+import {authData, blogData, blogsTestManager, createPostData, postsTestManager} from "../test-helpers";
+import {blogQueryRepo} from "../../src/modules/blogs/blog-queryRepo";
 
 
 describe('/blogs', () => {

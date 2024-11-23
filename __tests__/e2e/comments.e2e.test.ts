@@ -1,9 +1,9 @@
-import {clearDB} from "../src/db/mongoDb";
+import {clearDB} from "../../src/db/mongoDb";
 import request from "supertest";
-import {app} from "../src/app";
-import {SETTINGS} from "../src/settings";
-import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {bearerAuth, createPostData, postsTestManager, usersTestManager} from "./test-helpers";
+import {app} from "../../src/app";
+import {SETTINGS} from "../../src/settings";
+import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
+import {bearerAuth, createPostData, postsTestManager, usersTestManager} from "../test-helpers";
 
 
 describe('comments', () => {

@@ -1,9 +1,9 @@
-import {clearDB} from "../src/db/mongoDb";
-import {app} from "../src/app";
+import {clearDB} from "../../src/db/mongoDb";
+import {app} from "../../src/app";
 import request from "supertest";
-import {SETTINGS} from "../src/settings";
-import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {bearerAuth, usersTestManager} from "./test-helpers";
+import {SETTINGS} from "../../src/settings";
+import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
+import {bearerAuth, usersTestManager} from "../test-helpers";
 
 
 describe('/auth', () => {

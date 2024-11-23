@@ -1,9 +1,9 @@
 import request from 'supertest';
-import {SETTINGS} from '../src/settings'
-import {app} from "../src/app";
-import {clearDB} from "../src/db/mongoDb";
-import {authData, usersTestManager} from "./test-helpers";
-import {HTTP_STATUSES} from "../src/helpers/http-statuses";
+import {SETTINGS} from '../../src/settings'
+import {app} from "../../src/app";
+import {clearDB} from "../../src/db/mongoDb";
+import {authData, usersTestManager} from "../test-helpers";
+import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 
 
 describe('/users', () => {
