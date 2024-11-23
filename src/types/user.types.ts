@@ -17,4 +17,9 @@ export type UserDBType = {
     passwordHash: string;
     passwordSalt: string;
     createdAt: string;
+    emailConfirmation: {
+        confirmationCode: string | null;
+        expirationDate: Date | null;
+        isConfirmed: string;
+    }
 }
