@@ -3,7 +3,7 @@ import {app} from "../../src/app";
 import request from "supertest";
 import {SETTINGS} from "../../src/settings";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
-import {bearerAuth, usersTestManager} from "../test-helpers";
+import {bearerAuth, extractRefreshToken, usersTestManager} from "../test-helpers";
 
 
 describe('/auth', () => {
@@ -76,7 +76,6 @@ describe('/auth', () => {
     })
 
     it('should get information about user by accessToken', async () => {
-        // Добавляем пользователей
         const userData = {
             login: 'Zamir',
             password: 'password1',
@@ -109,5 +108,119 @@ describe('/auth', () => {
             userId: expect.any(String)
         })
     })
+
+    it('should get new accessToken and refreshToken', async () => {
+        const userData = {
+            login: 'Madrid',
+            password: 'password1',
+            email: 'madrid@gmail.com',
+        };
+
+        await usersTestManager.createUser(userData);
+
+        const authDataWithLogin = {
+            loginOrEmail: 'Madrid',
+            password: 'password1',
+        };
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authDataWithLogin)
+            .expect(HTTP_STATUSES.OK_200);
+
+        const refreshToken = extractRefreshToken(response.headers['set-cookie']);
+        const accessToken = response.body.accessToken;
+
+        const newResponse = await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+            .set('Cookie', `refreshToken=${refreshToken}`)
+            .expect(HTTP_STATUSES.OK_200);
+
+        const newRefreshToken = extractRefreshToken(newResponse.headers['set-cookie']);
+        const newAccessToken = newResponse.body.accessToken;
+
+        // Проверяем, что токены обновились
+        expect(refreshToken).not.toBe(newRefreshToken);
+        expect(accessToken).not.toBe(newAccessToken);
+    });
+
+    it('shouldn`t get new accessToken and refreshToken', async () => {
+        const userData = {
+            login: 'sitcom',
+            password: 'password1',
+            email: 'sitcom@gmail.com',
+        };
+
+        await usersTestManager.createUser(userData);
+
+        const authDataWithLogin = {
+            loginOrEmail: 'sitcom',
+            password: 'password1',
+        };
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authDataWithLogin)
+            .expect(HTTP_STATUSES.OK_200);
+
+        const refreshToken = extractRefreshToken(response.headers['set-cookie']);
+        const accessToken = response.body.accessToken;
+
+        const newResponse = await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+            .set('Cookie', `refreshToken=${refreshToken}`)
+            .expect(HTTP_STATUSES.OK_200);
+
+        const newRefreshToken = extractRefreshToken(newResponse.headers['set-cookie']);
+        const newAccessToken = newResponse.body.accessToken;
+
+        // Проверяем, что токены обновились
+        expect(refreshToken).not.toBe(newRefreshToken);
+        expect(accessToken).not.toBe(newAccessToken);
+
+        // Пытаемся обновить пару токенов, используя старый refreshToken
+        await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+            .set('Cookie', `refreshToken=${refreshToken}`)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401);
+    });
+
+
+    it('shouldn`t get new accessToken and refreshToken after logout', async () => {
+        const userData = {
+            login: 'mustard',
+            password: 'password1',
+            email: 'mustard@gmail.com',
+        };
+
+        await usersTestManager.createUser(userData);
+
+        const authDataWithLogin = {
+            loginOrEmail: 'mustard',
+            password: 'password1',
+        };
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authDataWithLogin)
+            .expect(HTTP_STATUSES.OK_200);
+
+        const refreshToken = extractRefreshToken(response.headers['set-cookie']);
+
+        await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/logout`)
+            .set('Cookie', `refreshToken=${refreshToken}`)
+            .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+        // Пытаемся обновить пару токенов, используя старый refreshToken
+        await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+            .set('Cookie', `refreshToken=${refreshToken}`)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401);
+    });
+
+
+
+
 
 })
