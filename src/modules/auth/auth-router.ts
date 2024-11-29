@@ -7,7 +7,7 @@ import {
     userPasswordValidator
 } from "../../validation/express-validator/field-validators";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
-import {accessTokenMiddleware} from "../../middlewares/authorization-middleware";
+import {accessTokenMiddleware, refreshTokenMiddleware} from "../../middlewares/authorization-middleware";
 
 
 export const authRouter = Router();
@@ -15,7 +15,9 @@ export const authRouter = Router();
 authRouter.post('/login', userloginOrEmailValidator,
     userPasswordValidator,
     errorsResultMiddleware,
-    authController.authentication)
+    authController.login)
+authRouter.post('/refresh-token', refreshTokenMiddleware,
+    authController.refreshToken)
 authRouter.post('/registration-confirmation',
     authController.registerConfirmation)
 authRouter.post('/registration',
@@ -27,5 +29,7 @@ authRouter.post('/registration',
 authRouter.post('/registration-email-resending',
     userEmailValidator,
     authController.registerEmailResending)
+authRouter.post('/logout', refreshTokenMiddleware,
+    authController.logout)
 authRouter.get('/me', accessTokenMiddleware,
     authController.getUserInfo)
