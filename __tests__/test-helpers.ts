@@ -227,3 +227,16 @@ export const usersTestManager = {
         return response;
     }
 }
+
+export const extractRefreshToken = (setCookieHeader: string | string[] | undefined): string | null => {
+    if (!setCookieHeader) return null; // Если заголовок отсутствует
+
+    const cookies = Array.isArray(setCookieHeader)
+        ? setCookieHeader
+        : typeof setCookieHeader === 'string'
+            ? setCookieHeader.split(',') // Разбиваем строку на массив
+            : [];
+
+    const refreshCookie = cookies.find(cookie => cookie.trim().startsWith('refreshToken='));
+    return refreshCookie ? refreshCookie.split(';')[0].split('=')[1] : null; // Извлечение значения
+};
