@@ -1,4 +1,4 @@
-import {blogCollection, commentCollection, postCollection, userCollection} from "../../db/mongoDb";
+import {blacklistCollection, blogCollection, commentCollection, postCollection, userCollection} from "../../db/mongoDb";
 
 export const testingRepository = {
     async clearDB() {
@@ -6,5 +6,6 @@ export const testingRepository = {
         await postCollection.deleteMany({});
         await userCollection.deleteMany({});
         await commentCollection.deleteMany({});
+        await blacklistCollection.deleteMany({});
     }
 }

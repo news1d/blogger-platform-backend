@@ -16,9 +16,11 @@ export const SETTINGS = {
         BLOG: 'blogs',
         POST: 'posts',
         USER: 'users',
-        COMMENT: 'comments'
+        COMMENT: 'comments',
+        BLACKLIST: 'blacklist'
     },
     MONGO_URL: process.env.MONGO_URL || 'mongodb://0.0.0.0:27017',
     DB_NAME: process.env.DB_NAME || '',
-    JWT_SECRET: process.env.JWT_SECRET || '123'
+    JWT_SECRET: process.env.JWT_SECRET || '123',
+    REFRESH_SECRET: process.env.REFRESH_SECRET || '123'
 }
