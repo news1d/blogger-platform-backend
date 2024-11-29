@@ -9,6 +9,7 @@ import {add} from "date-fns";
 import {nodemailerService} from "../../application/nodemailer-service";
 import {emailExamples} from "../../helpers/email-examples";
 import {MeViewModel} from "../../types/auth.types";
+import {userService} from "../users/user-service";
 
 
 export const authService = {
@@ -21,7 +22,7 @@ export const authService = {
         };
     },
     async registration(login: string, email: string, password: string): Promise<Result<string | null>> {
-        const result = await this.checkUnique(login, email);
+        const result = await userService.checkUnique(login, email);
 
         if (result.status !== DomainStatusCode.Success) {
             return result
@@ -89,20 +90,6 @@ export const authService = {
             .catch(er => console.error('Error in send email:', er));
 
         return createResult(DomainStatusCode.Success);
-    },
-    async checkUnique(login: string, email: string): Promise<Result<string | null>> {
-        const isLoginExists = await userRepository.getUserByLogin(login)
-        const isEmailExists = await userRepository.getUserByEmail(email)
-
-        if (isLoginExists) {
-            return createResult(DomainStatusCode.BadRequest, null, [{message: 'This login has already been used.', field: 'login'}])
-        }
-
-        if (isEmailExists) {
-            return createResult(DomainStatusCode.BadRequest, null, [{message: 'This email address has already been used.', field: 'email'}])
-        }
-
-        return createResult(DomainStatusCode.Success)
     },
     async _generateHash(password: string, salt: string) {
         return bcrypt.hash(password, salt);
