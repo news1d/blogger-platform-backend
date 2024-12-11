@@ -1,6 +1,6 @@
 import {randomUUID} from "crypto";
 import {add} from "date-fns";
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 import {userCollection} from "../../src/db/mongoDb";
 
 

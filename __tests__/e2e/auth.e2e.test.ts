@@ -7,7 +7,7 @@ import {bearerAuth, extractRefreshToken, usersTestManager} from "../test-helpers
 
 
 describe('/auth', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
         await clearDB();
     })
 
@@ -218,9 +218,4 @@ describe('/auth', () => {
             .set('Cookie', `refreshToken=${refreshToken}`)
             .expect(HTTP_STATUSES.UNAUTHORIZED_401);
     });
-
-
-
-
-
 })
