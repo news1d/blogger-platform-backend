@@ -9,26 +9,40 @@ import {DomainStatusCode} from "../../helpers/domain-status-code";
 import {RegisterConfCodeModel, RegisterEmailResendModel} from "../../types/registration.types";
 import {OutputErrorsType} from "../../types/output-errors.type";
 import {blacklistService} from "../../blacklist/blacklist-service";
+import {sessionService} from "../sessions/session-service";
+import {SETTINGS} from "../../settings";
 
 export const authController = {
     async login(req: Request<any, any, LoginInputModel>, res: Response<LoginSuccessViewModel>){
-        const userIdOrNull = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
+        const userId = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
 
-        if (!userIdOrNull) {
+        if (!userId) {
             res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
             return;
         }
 
-        const accessToken = await jwtService.createJWT(userIdOrNull)
-        const refreshToken = await jwtService.createRT(userIdOrNull)
+        const accessToken = await jwtService.createJWT(userId)
+        const refreshToken = await jwtService.createRT(userId)
+
+        const userAgent = req.headers['user-agent'];
+        const deviceName = userAgent || 'Default Device';
+        const ip = req.ip || 'unknown'
+
+        await sessionService.createSession(userId, deviceName, ip, refreshToken)
+
         res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
         res.status(HTTP_STATUSES.OK_200).json({accessToken: accessToken})
     },
     async refreshToken(req: Request, res: Response) {
+        const refreshToken = req.cookies.refreshToken;
         await blacklistService.addToken(req.cookies.refreshToken)
 
+        const tokenData = await jwtService.getTokenData(refreshToken, SETTINGS.REFRESH_SECRET)
+
         const newAccessToken = await jwtService.createJWT(req.userId!)
-        const newRefreshToken = await jwtService.createRT(req.userId!)
+        const newRefreshToken = await jwtService.updateRT(req.userId!, tokenData!.deviceId)
+
+        await sessionService.updateTokenDate(newRefreshToken)
 
         res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
         res.status(HTTP_STATUSES.OK_200).json({accessToken: newAccessToken})
@@ -64,7 +78,12 @@ export const authController = {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     },
     async logout(req: Request, res: Response) {
+        const refreshToken = req.cookies.refreshToken;
         await blacklistService.addToken(req.cookies.refreshToken)
+
+        const tokenData = await jwtService.getTokenData(refreshToken, SETTINGS.REFRESH_SECRET)
+        await sessionService.terminateSessionByDeviceId(req.userId!, tokenData!.deviceId)
+
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
     },
     async getUserInfo(req: Request, res: Response<MeViewModel>){
