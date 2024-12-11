@@ -11,13 +11,16 @@ export const SETTINGS = {
         USERS: '/api/users',
         AUTH: '/api/auth',
         COMMENTS: '/api/comments',
+        SESSIONS: '/api/security',
     },
     COLLECTION_NAME: {
         BLOG: 'blogs',
         POST: 'posts',
         USER: 'users',
         COMMENT: 'comments',
-        BLACKLIST: 'blacklist'
+        BLACKLIST: 'blacklist',
+        SESSION: 'session',
+        REQUEST: 'request',
     },
     MONGO_URL: process.env.MONGO_URL || 'mongodb://0.0.0.0:27017',
     DB_NAME: process.env.DB_NAME || '',
