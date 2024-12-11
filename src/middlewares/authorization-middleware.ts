@@ -2,6 +2,7 @@ import {SETTINGS} from "../settings";
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../helpers/http-statuses";
 import {jwtService} from "../application/jwt-service";
+import {sessionService} from "../modules/sessions/session-service";
 import {blacklistService} from "../blacklist/blacklist-service";
 
 export const ADMIN_AUTH = SETTINGS.ADMIN_AUTH;
@@ -50,11 +51,21 @@ export const refreshTokenMiddleware = async (req: Request, res: Response, next: 
         return;
     }
 
-    const userId = await jwtService.getUserIdByToken(refreshToken, SETTINGS.REFRESH_SECRET)
-    if (userId) {
-        req.userId = userId
-        next();
-    } else {
-        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+    const tokenData = await jwtService.getTokenData(refreshToken, SETTINGS.REFRESH_SECRET);
+    const session = await sessionService.findSessionByDeviceId(tokenData!.deviceId);
+
+    // Проверяем существование сессии
+    if (!session) {
+        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+        return;
     }
+
+    // Проверяем, что токен не истёк
+    if (new Date() > session.exp) {
+        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+        return;
+    }
+
+    req.userId = session.userId;
+    next();
 }
