@@ -3,12 +3,25 @@ import {nodemailerService} from "../../src/application/nodemailer-service";
 import {authService} from "../../src/modules/auth/auth-service";
 import {DomainStatusCode} from "../../src/helpers/domain-status-code";
 import {testSeeder} from "./test.seeder";
+import mongoose from "mongoose";
+import {SETTINGS} from "../../src/settings";
+import {userService} from "../../src/modules/users/user-service";
 
 
 describe('/auth-integration', () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
+        await mongoose.connect(SETTINGS.MONGO_URL + '/' + SETTINGS.DB_NAME);
         await clearDB();
-    })
+    });
+
+    afterAll(async () => {
+        await mongoose.disconnect();
+    });
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
 
     describe('userRegistration', () => {
         nodemailerService.sendEmail = jest
@@ -45,14 +58,14 @@ describe('/auth-integration', () => {
             });
 
             it('should not confirm email which is confirmed', async () => {
-                const code = 'test';
+                const code = 'test1';
 
                 const { login, password, email } = testSeeder.createUserDto();
                 await testSeeder.insertUser({
                     login,
                     password,
                     email,
-                    code,
+                    confirmationCode: code,
                     isConfirmed: 'confirmed'
                 });
 
@@ -61,14 +74,14 @@ describe('/auth-integration', () => {
             });
 
             it('should not confirm email with expired code', async () => {
-                const code = 'test';
+                const code = 'test2';
 
                 const { login, password, email } = testSeeder.createUserDto();
                 await testSeeder.insertUser({
                     login,
                     password,
                     email,
-                    code,
+                    confirmationCode: code,
                     expirationDate: new Date()
                 });
 
@@ -77,15 +90,60 @@ describe('/auth-integration', () => {
             });
 
             it('confirm user', async () => {
-                const code = 'validCode';
+                const code = 'test3';
 
                 const { login, password, email } = testSeeder.createUserDto();
-                await testSeeder.insertUser({ login, password, email, code });
+                await testSeeder.insertUser({ login, password, email, confirmationCode: code});
 
                 const result = await authService.registerConfirmation(code);
 
                 expect(result.status).toBe(DomainStatusCode.Success);
             });
+
+        })
+
+        describe('password recovery', () => {
+
+            it('should send recovery code', async () => {
+                const { login, password, email } = testSeeder.createUserDto();
+
+                const result = await authService.passwordRecovery(email);
+
+                expect(result).toBe(true);
+                expect(nodemailerService.sendEmail).toBeCalled();
+                expect(nodemailerService.sendEmail).toBeCalledTimes(1);
+            });
+
+            it('should create new password', async () => {
+                const code = 'test4';
+                const newPassword = 'validPassword'
+
+                const { login, password, email } = testSeeder.createUserDto();
+                await testSeeder.insertUser({ login, password, email, recoveryCode: code});
+
+                const result = await userService.newPassword(newPassword, code);
+
+                expect(result).toBe(true)
+            })
+
+            it('should not recovery password with expired code', async () => {
+                const code = 'test5';
+                const newPassword = 'validPassword'
+
+                const { login, password, email } = testSeeder.createUserDto();
+                await testSeeder.insertUser({
+                    login,
+                    password,
+                    email,
+                    recoveryCode: code,
+                    recoveryExpiration: new Date()
+                });
+
+                const result = await userService.newPassword(newPassword, code);
+                expect(result).toBe(false);
+            });
+
+
 
         })
 
