@@ -12,3 +12,8 @@ export type MeViewModel = {
     login: string;
     userId: string;
 }
+
+export type NewPasswordRecoveryInputModel = {
+    newPassword: string;
+    recoveryCode: string;
+}
