@@ -21,5 +21,9 @@ export type UserDBType = {
         confirmationCode: string | null;
         expirationDate: Date | null;
         isConfirmed: string;
+    },
+    passwordRecovery: {
+        recoveryCode: string | null,
+        expirationDate: Date | null;
     }
 }
