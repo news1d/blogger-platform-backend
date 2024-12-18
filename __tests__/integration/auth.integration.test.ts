@@ -123,7 +123,7 @@ describe('/auth-integration', () => {
 
                 const result = await userService.newPassword(newPassword, code);
 
-                expect(result).toBe(true)
+                expect(result.status).toBe(DomainStatusCode.Success);
             })
 
             it('should not recovery password with expired code', async () => {
@@ -140,7 +140,7 @@ describe('/auth-integration', () => {
                 });
 
                 const result = await userService.newPassword(newPassword, code);
-                expect(result).toBe(false);
+                expect(result.status).toBe(DomainStatusCode.BadRequest);
             });
 
 
