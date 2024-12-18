@@ -1,6 +1,6 @@
 import {CommentDBType, CommentViewModel} from "../../types/comments.types";
-import {commentCollection} from "../../db/mongoDb";
 import {ObjectId, WithId} from "mongodb";
+import {CommentModel} from "../../entities/comment.entity";
 
 export const commentQueryRepo = {
     async getCommentsForPost(pageNumber: number,
@@ -13,12 +13,12 @@ export const commentQueryRepo = {
             postId: postId,
         }
 
-        const comments = await commentCollection
+        const comments = await CommentModel
             .find(filter)
             .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
         return comments.map(this.mapToOutput)
     },
@@ -27,10 +27,10 @@ export const commentQueryRepo = {
             postId: postId,
         }
 
-        return commentCollection.countDocuments(filter)
+        return CommentModel.countDocuments(filter)
     },
     async getCommentById(id: string): Promise<CommentViewModel | null> {
-        const comment = await commentCollection.findOne({_id: new ObjectId(id)});
+        const comment = await CommentModel.findOne({_id: new ObjectId(id)});
         if (!comment) {
             return null;
         }

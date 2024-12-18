@@ -1,6 +1,6 @@
-import {userCollection} from "../../db/mongoDb";
 import {ObjectId, WithId} from "mongodb";
 import {UserDBType, UserViewModel} from "../../types/user.types";
+import {UserModel} from "../../entities/user.entity";
 
 
 export const userQueryRepo = {
@@ -23,12 +23,12 @@ export const userQueryRepo = {
 
         const query = filter.length > 0 ? { $or: filter } : {};
 
-        const users = await userCollection
+        const users = await UserModel
             .find(query)
             .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
         return users.map(this.mapToOutput)
 
@@ -46,11 +46,11 @@ export const userQueryRepo = {
 
         const query = filter.length > 0 ? { $or: filter } : {};
 
-        return userCollection.countDocuments(query)
+        return UserModel.countDocuments(query)
 
     },
     async getUserById(id: string): Promise<UserViewModel | null> {
-        const user = await userCollection.findOne({_id: new ObjectId(id)});
+        const user = await UserModel.findOne({_id: new ObjectId(id)});
 
         if (!user) {
             return null;

@@ -1,14 +1,14 @@
 import {BlogDBType, BlogInputModel} from "../../types/blog.types";
-import {blogCollection} from "../../db/mongoDb";
 import {ObjectId} from "mongodb";
+import {BlogModel} from "../../entities/blog.entity";
 
 export const blogRepository = {
     async createBlog(blog: BlogDBType): Promise<string> {
-        const result = await blogCollection.insertOne(blog)
-        return result.insertedId.toString();
+        const result = await BlogModel.create(blog);
+        return result._id.toString();
     },
     async updateBlogById(id: string, body: BlogInputModel): Promise<boolean>{
-        const result = await blogCollection.updateOne({_id: new ObjectId(id)}, {$set: {
+        const result = await BlogModel.updateOne({_id: new ObjectId(id)}, {$set: {
                 name: body.name,
                 description: body.description,
                 websiteUrl: body.websiteUrl,
@@ -17,7 +17,7 @@ export const blogRepository = {
         return result.matchedCount === 1;
     },
     async deleteBlogById(id: string): Promise<boolean>{
-        const result = await blogCollection.deleteOne({_id: new ObjectId(id)});
+        const result = await BlogModel.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
     }
 }

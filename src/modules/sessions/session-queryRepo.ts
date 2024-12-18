@@ -1,9 +1,9 @@
-import {sessionCollection} from "../../db/mongoDb";
 import {SessionViewModel, SessionDBType} from "../../types/sessions.types";
+import {SessionModel} from "../../entities/session.entity";
 
 export const sessionQueryRepo = {
     async getSessions(userId: string): Promise<SessionViewModel[]> {
-        const sessions = await sessionCollection.find({ userId: userId }).toArray();
+        const sessions = await SessionModel.find({ userId: userId }).lean();
         return sessions.map(this.mapToOutput)
     },
     mapToOutput(session: SessionDBType): SessionViewModel {

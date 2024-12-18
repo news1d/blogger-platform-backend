@@ -1,6 +1,6 @@
 import {PostDBType, PostViewModel} from "../../types/post.types";
-import {postCollection} from "../../db/mongoDb";
 import {ObjectId, WithId} from "mongodb";
+import {PostModel} from "../../entities/post.entity";
 
 
 export const postQueryRepo = {
@@ -16,12 +16,12 @@ export const postQueryRepo = {
             filter.blogId = blogId ;
         }
 
-        const posts = await postCollection
+        const posts = await PostModel
             .find(filter)
             .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
         return posts.map(this.mapToOutput)
     },
@@ -32,10 +32,10 @@ export const postQueryRepo = {
             filter.blogId = blogId ;
         }
 
-        return postCollection.countDocuments(filter)
+        return PostModel.countDocuments(filter)
     },
     async getPostById(id: string): Promise<PostViewModel | null> {
-        const post = await postCollection.findOne({_id: new ObjectId(id)});
+        const post = await PostModel.findOne({_id: new ObjectId(id)});
         if (!post) {
             return null;
         }

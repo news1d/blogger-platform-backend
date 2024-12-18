@@ -1,20 +1,19 @@
-import {
-    blacklistCollection,
-    blogCollection,
-    commentCollection,
-    postCollection, requestCollection,
-    sessionCollection,
-    userCollection
-} from "../../db/mongoDb";
+import {BlogModel} from "../../entities/blog.entity";
+import {PostModel} from "../../entities/post.entity";
+import {UserModel} from "../../entities/user.entity";
+import {CommentModel} from "../../entities/comment.entity";
+import {BlacklistModel} from "../../entities/blacklist.entity";
+import {SessionModel} from "../../entities/session.entity";
+import {RequestModel} from "../../entities/request.entity";
 
 export const testingRepository = {
     async clearDB() {
-        await blogCollection.deleteMany({});
-        await postCollection.deleteMany({});
-        await userCollection.deleteMany({});
-        await commentCollection.deleteMany({});
-        await blacklistCollection.deleteMany({});
-        await sessionCollection.deleteMany({});
-        await requestCollection.deleteMany({});
+        await BlogModel.deleteMany({});
+        await PostModel.deleteMany({});
+        await UserModel.deleteMany({});
+        await CommentModel.deleteMany({});
+        await BlacklistModel.deleteMany({});
+        await SessionModel.deleteMany({});
+        await RequestModel.deleteMany({});
     }
 }

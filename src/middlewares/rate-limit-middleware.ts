@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import {requestCollection} from "../db/mongoDb";
 import {HTTP_STATUSES} from "../helpers/http-statuses";
-
+import {RequestModel} from "../entities/request.entity";
 
 export const rateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const IP = req.ip || 'unknown';
@@ -11,7 +10,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
     const LIMIT = 5;
 
     try {
-        const count = await requestCollection.countDocuments({
+        const count = await RequestModel.countDocuments({
             IP: IP,
             URL: URL,
             date: { $gte: tenSecondsAgo }
@@ -22,7 +21,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
             return;
         }
 
-        await requestCollection.insertOne({
+        await RequestModel.create({
             IP: IP,
             URL: URL,
             date: now

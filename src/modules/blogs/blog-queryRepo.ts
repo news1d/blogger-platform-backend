@@ -1,6 +1,6 @@
 import {BlogDBType, BlogViewModel} from "../../types/blog.types";
-import {blogCollection} from "../../db/mongoDb";
 import { WithId, ObjectId} from "mongodb";
+import {BlogModel} from "../../entities/blog.entity";
 
 export const blogQueryRepo = {
     async getBlogs(pageNumber: number,
@@ -15,12 +15,12 @@ export const blogQueryRepo = {
             filter.name = { $regex: searchNameTerm, $options: "i" };
         }
 
-        const blogs = await blogCollection
+        const blogs = await BlogModel
             .find(filter)
             .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
         return blogs.map(this.mapToOutput)
     },
@@ -31,10 +31,10 @@ export const blogQueryRepo = {
             filter.name = { $regex: serchNameTerm, $options: "i" };
         }
 
-        return blogCollection.countDocuments(filter)
+        return BlogModel.countDocuments(filter)
     },
     async getBlogById(id: string): Promise<BlogViewModel | null>{
-        const blog = await blogCollection.findOne({_id: new ObjectId(id)});
+        const blog = await BlogModel.findOne({_id: new ObjectId(id)});
 
         if (!blog) {
             return null;
