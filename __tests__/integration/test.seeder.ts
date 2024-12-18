@@ -1,16 +1,17 @@
 import {randomUUID} from "crypto";
 import {add} from "date-fns";
 import * as bcrypt from "bcrypt";
-import {userCollection} from "../../src/db/mongoDb";
-
+import {UserModel} from "../../src/entities/user.entity";
 
 type RegisterUserPayloadType = {
     login: string,
     password: string,
     email: string,
-    code?: string,
+    confirmationCode?: string,
     expirationDate?: Date,
-    isConfirmed?: string
+    isConfirmed?: string,
+    recoveryCode?: string,
+    recoveryExpiration?: Date,
 }
 
 export type RegisterUserResultType = {
@@ -47,7 +48,7 @@ export const testSeeder = {
         }
         return users;
     },
-    async insertUser({login, password, email, code, expirationDate, isConfirmed}: RegisterUserPayloadType ): Promise<RegisterUserResultType> {
+    async insertUser({login, password, email, confirmationCode: confirmationCode, expirationDate, isConfirmed, recoveryCode: recoveryCode, recoveryExpiration: recoveryExpiration}: RegisterUserPayloadType ): Promise<RegisterUserResultType> {
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, passwordSalt);
 
@@ -58,19 +59,24 @@ export const testSeeder = {
             passwordSalt: passwordSalt,
             createdAt: new Date().toISOString(),
             emailConfirmation: {
-                confirmationCode: code ?? randomUUID(),
+                confirmationCode: confirmationCode ?? randomUUID(),
                 expirationDate: expirationDate ?? add(new Date(), {
                     minutes: 30,
                 }),
                 isConfirmed: isConfirmed === 'confirmed' ? 'confirmed' : 'unconfirmed'
+            },
+            passwordRecovery: {
+                recoveryCode: recoveryCode ?? randomUUID(),
+                expirationDate: recoveryExpiration ?? add(new Date(), {
+                    minutes: 5,})
             }
         };
 
-        const res = await userCollection.insertOne({...newUser});
+        const res = await UserModel.create({...newUser});
 
         return {
-            id: res.insertedId.toString(),
+            id: res._id.toString(),
             ...newUser
         }
-    }
+    },
 }
