@@ -2,6 +2,6 @@ export type RegisterConfCodeModel = {
     code: string;
 }
 
-export type RegisterEmailResendModel = {
+export type EmailInputModel = {
     email: string;
 }
