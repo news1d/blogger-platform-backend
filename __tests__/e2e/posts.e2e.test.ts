@@ -4,12 +4,19 @@ import {clearDB} from "../../src/db/mongoDb";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 import {authData, bearerAuth, createPostData, postsTestManager, usersTestManager} from "../test-helpers";
 import {SETTINGS} from "../../src/settings";
+import mongoose from "mongoose";
 
 
 describe('/posts', () => {
     beforeAll(async () => {
-       await clearDB();
-    })
+        await mongoose.connect(SETTINGS.MONGO_URL + '/' + SETTINGS.DB_NAME);
+        await clearDB();
+    });
+
+    afterAll(async () => {
+        await mongoose.disconnect();
+    });
+
 
     it('unauthorized user shouldn`t create post', async () => {
         const postData = await createPostData();

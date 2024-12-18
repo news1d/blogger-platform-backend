@@ -4,9 +4,20 @@ import request from "supertest";
 import {SETTINGS} from "../../src/settings";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 import {bearerAuth, extractRefreshToken, usersTestManager} from "../test-helpers";
+import mongoose from "mongoose";
 
 
 describe('/auth', () => {
+    beforeAll(async () => {
+        await mongoose.connect(SETTINGS.MONGO_URL + '/' + SETTINGS.DB_NAME);
+        await clearDB();
+    });
+
+    afterAll(async () => {
+        await mongoose.disconnect();
+    });
+
+
     beforeEach(async () => {
         await clearDB();
     })

@@ -4,16 +4,19 @@ import {app} from "../../src/app";
 import {clearDB} from "../../src/db/mongoDb";
 import {authData, usersTestManager} from "../test-helpers";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
+import mongoose from "mongoose";
 
 
 describe('/users', () => {
     beforeAll(async () => {
-        await clearDB()
-    })
-
-    afterAll(async () => {
+        await mongoose.connect(SETTINGS.MONGO_URL + '/' + SETTINGS.DB_NAME);
         await clearDB();
     });
+
+    afterAll(async () => {
+        await mongoose.disconnect();
+    });
+
 
     it('should return a paginated list of users sorted by name', async () => {
         // Добавляем пользователей

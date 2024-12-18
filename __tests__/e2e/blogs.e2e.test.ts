@@ -5,12 +5,18 @@ import {clearDB} from "../../src/db/mongoDb";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 import {authData, blogData, blogsTestManager, createPostData, postsTestManager} from "../test-helpers";
 import {blogQueryRepo} from "../../src/modules/blogs/blog-queryRepo";
+import mongoose from "mongoose";
 
 
 describe('/blogs', () => {
     beforeAll(async () => {
+        await mongoose.connect(SETTINGS.MONGO_URL + '/' + SETTINGS.DB_NAME);
         await clearDB();
-    })
+    });
+
+    afterAll(async () => {
+        await mongoose.disconnect();
+    });
 
     it('should return 204 and empty array', async () => {
         await request(app)
