@@ -42,11 +42,11 @@ export const authController = {
         await authService.passwordRecovery(req.body.email)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     },
-    async newPassword(req: Request<any, any, NewPasswordRecoveryInputModel>, res: Response) {
+    async newPassword(req: Request<any, any, NewPasswordRecoveryInputModel>, res: Response<OutputErrorsType>) {
         const result = await userService.newPassword(req.body.newPassword, req.body.recoveryCode)
 
-        if (!result){
-            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
+        if (result.status !== DomainStatusCode.Success) {
+            res.status(HTTP_STATUSES.BAD_REQUEST_400).json({errorsMessages: result.errorsMessages})
             return;
         }
 

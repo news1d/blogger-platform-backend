@@ -72,24 +72,22 @@ export const userService = {
 
         return createResult(DomainStatusCode.Success)
     },
-    async newPassword(password: string, code: string): Promise<boolean>{
+    async newPassword(password: string, code: string): Promise<Result<string | null>>{
         const user = await userRepository.findUserByRecoveryCode(code)
 
         if (!user || user.passwordRecovery.recoveryCode !== code) {
-            return false;
+            return createResult(DomainStatusCode.BadRequest, null, [{ message: 'Recovery code incorrect.', field: 'recoveryCode' }])
         }
 
         if (user.passwordRecovery.expirationDate! < new Date()) {
-            console.log('recoveryExpiration: ', user!.passwordRecovery.expirationDate)
-            console.log('DateNow: ', new Date())
-            return false;
+            return createResult(DomainStatusCode.BadRequest, null, [{ message: 'Recovery code expired.', field: 'recoveryCode' }])
         }
 
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(password, passwordSalt);
 
         await userRepository.updatePassword(user._id.toString(), passwordHash, passwordSalt)
-        return true;
+        return createResult(DomainStatusCode.Success);
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);
