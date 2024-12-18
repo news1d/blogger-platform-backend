@@ -1,15 +1,12 @@
 import {Router} from "express";
 import {authController} from "./auth-controller";
 import {
-    userEmailValidator, userEmailValidatorWithoutMessage,
+    userEmailValidator,
     userloginOrEmailValidator,
     userLoginValidator, userNewPasswordValidator,
     userPasswordValidator
 } from "../../validation/express-validator/field-validators";
-import {
-    errorsResultMiddleware,
-    errorsResultMiddlewareWithoutMessage
-} from "../../validation/express-validator/errors-result-middleware";
+import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {accessTokenMiddleware, refreshTokenMiddleware} from "../../middlewares/authorization-middleware";
 import {rateLimitMiddleware} from "../../middlewares/rate-limit-middleware";
 
@@ -22,13 +19,13 @@ authRouter.post('/login', userloginOrEmailValidator,
     rateLimitMiddleware,
     authController.login)
 authRouter.post('/password-recovery',
-    userEmailValidatorWithoutMessage,
-    errorsResultMiddlewareWithoutMessage,
+    userEmailValidator,
+    errorsResultMiddleware,
     rateLimitMiddleware,
     authController.passwordRecovery)
 authRouter.post('/new-password',
     userNewPasswordValidator,
-    errorsResultMiddlewareWithoutMessage,
+    errorsResultMiddleware,
     rateLimitMiddleware,
     authController.newPassword)
 authRouter.post('/refresh-token', refreshTokenMiddleware,
