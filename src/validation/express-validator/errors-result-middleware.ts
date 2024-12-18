@@ -20,3 +20,12 @@ export const errorsResultMiddleware = (req: Request, res: Response<OutputErrorsT
         next();
     }
 }
+
+export const errorsResultMiddlewareWithoutMessage = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+        return;
+    }
+    next();
+};
