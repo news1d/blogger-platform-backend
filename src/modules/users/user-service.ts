@@ -26,6 +26,10 @@ export const userService = {
                 confirmationCode: null,
                 expirationDate: null,
                 isConfirmed: 'confirmed',
+            },
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null
             }
         }
 
@@ -67,6 +71,25 @@ export const userService = {
         }
 
         return createResult(DomainStatusCode.Success)
+    },
+    async newPassword(password: string, code: string): Promise<boolean>{
+        const user = await userRepository.findUserByRecoveryCode(code)
+
+        if (!user || user.passwordRecovery.recoveryCode !== code) {
+            return false;
+        }
+
+        if (user.passwordRecovery.expirationDate! < new Date()) {
+            console.log('recoveryExpiration: ', user!.passwordRecovery.expirationDate)
+            console.log('DateNow: ', new Date())
+            return false;
+        }
+
+        const passwordSalt = await bcrypt.genSalt(10);
+        const passwordHash = await this._generateHash(password, passwordSalt);
+
+        await userRepository.updatePassword(user._id.toString(), passwordHash, passwordSalt)
+        return true;
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);

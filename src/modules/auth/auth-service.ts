@@ -21,6 +21,24 @@ export const authService = {
             userId: user!._id.toString(),
         };
     },
+    async passwordRecovery(email: string): Promise<boolean> {
+        const user = await userRepository.getUserByEmail(email);
+
+        if (!user) {
+            return true;
+        }
+
+        const newCode = randomUUID().toString()
+        const newExpirationDate = add(new Date(), { minutes: 5 })
+
+        await userRepository.updateRecoveryCode(user._id.toString(), newCode, newExpirationDate)
+        const updatedUser = await userRepository.getUserById(user._id.toString())
+
+        nodemailerService.sendEmail(updatedUser!.email, updatedUser!.passwordRecovery.recoveryCode!, emailExamples.passwordRecovery)
+            .catch(er => console.error('Error in send email:', er));
+
+        return true;
+    },
     async registration(login: string, email: string, password: string): Promise<Result<string | null>> {
         const result = await userService.checkUnique(login, email);
 
@@ -42,6 +60,10 @@ export const authService = {
                 expirationDate: add(new Date(), { minutes: 5 }),
                 isConfirmed: 'unconfirmed',
             },
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null
+            }
         };
 
         await userRepository.createUser(user);

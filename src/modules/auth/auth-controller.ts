@@ -1,12 +1,17 @@
 import {Request, Response} from 'express';
 import {userService} from "../users/user-service";
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
-import {LoginInputModel, LoginSuccessViewModel, MeViewModel} from "../../types/auth.types";
+import {
+    LoginInputModel,
+    LoginSuccessViewModel,
+    MeViewModel,
+    NewPasswordRecoveryInputModel
+} from "../../types/auth.types";
 import {jwtService} from "../../application/jwt-service";
 import {UserInputModel} from "../../types/user.types";
 import {authService} from "./auth-service";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
-import {RegisterConfCodeModel, RegisterEmailResendModel} from "../../types/registration.types";
+import {RegisterConfCodeModel, EmailInputModel} from "../../types/registration.types";
 import {OutputErrorsType} from "../../types/output-errors.type";
 import {blacklistService} from "../../blacklist/blacklist-service";
 import {sessionService} from "../sessions/session-service";
@@ -32,6 +37,20 @@ export const authController = {
 
         res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
         res.status(HTTP_STATUSES.OK_200).json({accessToken: accessToken})
+    },
+    async passwordRecovery(req: Request<any, any, EmailInputModel>, res: Response){
+        await authService.passwordRecovery(req.body.email)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    },
+    async newPassword(req: Request<any, any, NewPasswordRecoveryInputModel>, res: Response) {
+        const result = await userService.newPassword(req.body.newPassword, req.body.recoveryCode)
+
+        if (!result){
+            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
+            return;
+        }
+
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     },
     async refreshToken(req: Request, res: Response) {
         const refreshToken = req.cookies.refreshToken;
@@ -67,7 +86,7 @@ export const authController = {
 
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     },
-    async registerEmailResending(req: Request<any, any, RegisterEmailResendModel>, res: Response<OutputErrorsType>) {
+    async registerEmailResending(req: Request<any, any, EmailInputModel>, res: Response<OutputErrorsType>) {
         const result = await authService.registerEmailResending(req.body.email)
 
         if (result.status !== DomainStatusCode.Success) {
