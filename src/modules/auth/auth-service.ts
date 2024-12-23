@@ -1,4 +1,4 @@
-import {userRepository} from "../users/user-repository";
+import {UserRepository} from "../users/user-repository";
 import bcrypt from "bcrypt";
 import {UserDBType} from "../../types/user.types";
 import {Result} from "../../types/result.types";
@@ -9,20 +9,23 @@ import {add} from "date-fns";
 import {nodemailerService} from "../../application/nodemailer-service";
 import {emailExamples} from "../../helpers/email-examples";
 import {MeViewModel} from "../../types/auth.types";
-import {userService} from "../users/user-service";
+import {UserService} from "../users/user-service";
 
 
-export const authService = {
+export class AuthService {
+    constructor(protected userRepository: UserRepository, protected userService: UserService) {}
+
     async getMyInfo(userId: string): Promise<MeViewModel | null> {
-        const user = await userRepository.getUserById(userId);
+        const user = await this.userRepository.getUserById(userId);
         return {
             email: user!.email,
             login: user!.login,
             userId: user!._id.toString(),
         };
-    },
+    }
+
     async passwordRecovery(email: string): Promise<boolean> {
-        const user = await userRepository.getUserByEmail(email);
+        const user = await this.userRepository.getUserByEmail(email);
 
         if (!user) {
             return true;
@@ -31,16 +34,17 @@ export const authService = {
         const newCode = randomUUID().toString()
         const newExpirationDate = add(new Date(), { minutes: 5 })
 
-        await userRepository.updateRecoveryCode(user._id.toString(), newCode, newExpirationDate)
-        const updatedUser = await userRepository.getUserById(user._id.toString())
+        await this.userRepository.updateRecoveryCode(user._id.toString(), newCode, newExpirationDate)
+        const updatedUser = await this.userRepository.getUserById(user._id.toString())
 
         nodemailerService.sendEmail(updatedUser!.email, updatedUser!.passwordRecovery.recoveryCode!, emailExamples.passwordRecovery)
             .catch(er => console.error('Error in send email:', er));
 
         return true;
-    },
+    }
+
     async registration(login: string, email: string, password: string): Promise<Result<string | null>> {
-        const result = await userService.checkUnique(login, email);
+        const result = await this.userService.checkUnique(login, email);
 
         if (result.status !== DomainStatusCode.Success) {
             return result
@@ -66,15 +70,16 @@ export const authService = {
             }
         };
 
-        await userRepository.createUser(user);
+        await this.userRepository.createUser(user);
 
         nodemailerService.sendEmail(user.email, user.emailConfirmation.confirmationCode!, emailExamples.registrationEmail)
             .catch(er => console.error('Error in send email:', er));
 
         return createResult(DomainStatusCode.Success);
-    },
+    }
+
     async registerConfirmation(code: string): Promise<Result<string | null>> {
-        const user = await userRepository.findUserByConfirmationCode(code)
+        const user = await this.userRepository.findUserByConfirmationCode(code)
 
         if (!user || user.emailConfirmation.confirmationCode !== code) {
             return createResult(DomainStatusCode.BadRequest, null, [{ message: 'Verification code incorrect.', field: 'code' }])
@@ -88,11 +93,12 @@ export const authService = {
             return createResult(DomainStatusCode.BadRequest, null, [{ message: 'Verification code expired.', field: 'code' }])
         }
 
-        await userRepository.updateConfirmation(user._id.toString())
+        await this.userRepository.updateConfirmation(user._id.toString())
         return createResult(DomainStatusCode.Success)
-    },
+    }
+
     async registerEmailResending(email: string) {
-        const user = await userRepository.getUserByEmail(email);
+        const user = await this.userRepository.getUserByEmail(email);
 
         if (!user) {
             return createResult(DomainStatusCode.BadRequest, null, [{ message: 'The user does not exist.', field: 'email' }])
@@ -105,14 +111,15 @@ export const authService = {
         const newCode = randomUUID().toString()
         const newExpirationDate = add(new Date(), { minutes: 5 })
 
-        await userRepository.updateConfirmationCode(user._id.toString(), newCode, newExpirationDate)
-        const updatedUser = await userRepository.getUserById(user._id.toString())
+        await this.userRepository.updateConfirmationCode(user._id.toString(), newCode, newExpirationDate)
+        const updatedUser = await this.userRepository.getUserById(user._id.toString())
 
         nodemailerService.sendEmail(updatedUser!.email, updatedUser!.emailConfirmation.confirmationCode!, emailExamples.registrationEmail)
             .catch(er => console.error('Error in send email:', er));
 
         return createResult(DomainStatusCode.Success);
-    },
+    }
+
     async _generateHash(password: string, salt: string) {
         return bcrypt.hash(password, salt);
     }

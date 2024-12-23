@@ -1,11 +1,10 @@
 import {clearDB} from "../../src/db/mongoDb";
 import {nodemailerService} from "../../src/application/nodemailer-service";
-import {authService} from "../../src/modules/auth/auth-service";
 import {DomainStatusCode} from "../../src/helpers/domain-status-code";
 import {testSeeder} from "./test.seeder";
 import mongoose from "mongoose";
 import {SETTINGS} from "../../src/settings";
-import {userService} from "../../src/modules/users/user-service";
+import {authService, userService} from "../../src/composition-root";
 
 
 describe('/auth-integration', () => {

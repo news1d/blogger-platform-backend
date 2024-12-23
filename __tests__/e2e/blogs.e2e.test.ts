@@ -4,8 +4,8 @@ import {app} from "../../src/app";
 import {clearDB} from "../../src/db/mongoDb";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 import {authData, blogData, blogsTestManager, createPostData, postsTestManager} from "../test-helpers";
-import {blogQueryRepo} from "../../src/modules/blogs/blog-queryRepo";
 import mongoose from "mongoose";
+import {blogQueryRepo} from "../../src/composition-root";
 
 
 describe('/blogs', () => {

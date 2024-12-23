@@ -1,10 +1,12 @@
 import {BlogDBType, BlogInputModel} from "../../types/blog.types";
-import {blogRepository} from "./blog-repository";
-import {postRepository} from "../posts/post-repository";
 import {PostDBType, PostInputModel} from "../../types/post.types";
+import {PostRepository} from "../posts/post-repository";
+import {BlogRepository} from "./blog-repository";
 
 
-export const blogService = {
+export class BlogService {
+    constructor(protected blogRepository: BlogRepository, protected postRepository: PostRepository) {}
+
     async createBlog(body: BlogInputModel): Promise<string> {
         const blog: BlogDBType = {
             name: body.name,
@@ -13,8 +15,9 @@ export const blogService = {
             createdAt: new Date().toISOString(),
             isMembership: false,
         }
-        return await blogRepository.createBlog(blog)
-    },
+        return await this.blogRepository.createBlog(blog)
+    }
+
     async createPostsByBlogId(blogId: string, blogName: string, body: Omit<PostInputModel, 'blogId'>): Promise<string> {
         const post: PostDBType = {
             title: body.title,
@@ -25,12 +28,14 @@ export const blogService = {
             createdAt: new Date().toISOString()
         }
 
-        return await postRepository.createPost(post)
-    },
+        return await this.postRepository.createPost(post)
+    }
+
     async updateBlogById(id: string, body: BlogInputModel): Promise<boolean>{
-        return await blogRepository.updateBlogById(id, body)
-    },
+        return await this.blogRepository.updateBlogById(id, body)
+    }
+
     async deleteBlogById(id: string): Promise<boolean>{
-        return await blogRepository.deleteBlogById(id)
+        return await this.blogRepository.deleteBlogById(id)
     }
 }

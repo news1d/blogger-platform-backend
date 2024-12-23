@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {userController} from "./user-controller";
+import {userController} from "../../composition-root";
 import {authMiddleware} from "../../middlewares/authorization-middleware";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {validateUserQueryParams} from "../../validation/express-validator/query-validators";
@@ -14,14 +14,14 @@ export const userRouter = Router()
 
 userRouter.get('/', authMiddleware,
     validateUserQueryParams,
-    userController.getUsers)
+    userController.getUsers.bind(userController))
 userRouter.post('/', authMiddleware,
     userLoginValidator,
     userPasswordValidator,
     userEmailValidator,
     errorsResultMiddleware,
-    userController.createUser);
+    userController.createUser.bind(userController));
 userRouter.delete('/:id', authMiddleware,
     idValidator,
     errorsResultMiddleware,
-    userController.deleteUserById)
+    userController.deleteUserById.bind(userController))

@@ -6,7 +6,7 @@ import {BlacklistModel} from "../../entities/blacklist.entity";
 import {SessionModel} from "../../entities/session.entity";
 import {RequestModel} from "../../entities/request.entity";
 
-export const testingRepository = {
+export class TestingRepository {
     async clearDB() {
         await BlogModel.deleteMany({});
         await PostModel.deleteMany({});

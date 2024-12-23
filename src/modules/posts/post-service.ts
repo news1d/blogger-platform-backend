@@ -1,11 +1,13 @@
 import {PostDBType, PostInputModel} from "../../types/post.types";
-import {postRepository} from "./post-repository";
 import {CommentDBType, CommentInputModel} from "../../types/comments.types";
-import {userRepository} from "../users/user-repository";
-import {commentRepository} from "../comments/comment-repository";
+import {UserRepository} from "../users/user-repository";
+import {PostRepository} from "./post-repository";
+import {CommentRepository} from "../comments/comment-repository";
 
 
-export const postService = {
+export class PostService {
+    constructor(protected postRepository: PostRepository, protected userRepository: UserRepository, protected commentRepository: CommentRepository) {}
+
     async createPost(blogName: string, body: PostInputModel): Promise<string>{
         const post: PostDBType = {
             title: body.title,
@@ -15,10 +17,11 @@ export const postService = {
             blogName: blogName,
             createdAt: new Date().toISOString()
         }
-        return await postRepository.createPost(post);
-    },
+        return await this.postRepository.createPost(post);
+    }
+
     async createCommentByPostId(postId: string, userId: string, body: CommentInputModel): Promise<string> {
-        const user = await userRepository.getUserById(userId);
+        const user = await this.userRepository.getUserById(userId);
 
         const comment: CommentDBType = {
             content: body.content,
@@ -30,13 +33,15 @@ export const postService = {
             postId: postId
         }
 
-        return await commentRepository.createComment(comment);
+        return await this.commentRepository.createComment(comment);
 
-    },
+    }
+
     async updatePostById(id: string, blogName: string, body: PostInputModel): Promise<boolean> {
-        return await postRepository.updatePostById(id, blogName, body);
-    },
+        return await this.postRepository.updatePostById(id, blogName, body);
+    }
+
     async deletePostById(id: string): Promise<boolean>{
-        return await postRepository.deletePostById(id)
-    },
+        return await this.postRepository.deletePostById(id)
+    }
 }

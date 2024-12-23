@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {blogController} from "./blog-controller";
+import {blogController} from "../../composition-root";
 import {
     blogDescriptionValidator, blogIdValidator,
     blogNameValidator,
@@ -16,18 +16,18 @@ export const blogRouter = Router();
 
 blogRouter.get('/', validateBlogQueryParams,
     errorsResultMiddleware,
-    blogController.getBlogs);
+    blogController.getBlogs.bind(blogController));
 blogRouter.post('/', authMiddleware,
     blogNameValidator,
     blogDescriptionValidator,
     blogWebsiteUrlValidator,
     errorsResultMiddleware,
-    blogController.createBlog);
+    blogController.createBlog.bind(blogController));
 blogRouter.get('/:blogId/posts',
     validateBlogQueryParams,
     blogIdValidator,
     errorsResultMiddleware,
-    blogController.getPostsByBlogId)
+    blogController.getPostsByBlogId.bind(blogController))
 blogRouter.post('/:blogId/posts', authMiddleware,
     validateBlogQueryParams,
     blogIdValidator,
@@ -35,20 +35,20 @@ blogRouter.post('/:blogId/posts', authMiddleware,
     postShortDescriptionValidator,
     postContentValidator,
     errorsResultMiddleware,
-    blogController.createPostByBlogId)
+    blogController.createPostByBlogId.bind(blogController))
 blogRouter.get('/:id',
     idValidator,
     errorsResultMiddleware,
-    blogController.getBlogById);
+    blogController.getBlogById.bind(blogController));
 blogRouter.put('/:id', authMiddleware,
     idValidator,
     blogNameValidator,
     blogDescriptionValidator,
     blogWebsiteUrlValidator,
     errorsResultMiddleware,
-    blogController.updateBlogById);
+    blogController.updateBlogById.bind(blogController));
 blogRouter.delete('/:id', authMiddleware,
     idValidator,
     errorsResultMiddleware,
-    blogController.deleteBlogById);
+    blogController.deleteBlogById.bind(blogController));
 

@@ -1,11 +1,12 @@
 import {SessionViewModel, SessionDBType} from "../../types/sessions.types";
 import {SessionModel} from "../../entities/session.entity";
 
-export const sessionQueryRepo = {
+export class SessionQueryRepo {
     async getSessions(userId: string): Promise<SessionViewModel[]> {
         const sessions = await SessionModel.find({ userId: userId }).lean();
         return sessions.map(this.mapToOutput)
-    },
+    }
+
     mapToOutput(session: SessionDBType): SessionViewModel {
         return {
             ip: session.ip,

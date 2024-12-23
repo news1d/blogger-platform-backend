@@ -1,10 +1,12 @@
 import {Request, Response} from 'express';
-import {testingRepository} from "./testing-repository";
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
+import {TestingRepository} from "./testing-repository";
 
-export const testingController = {
+export class TestingController {
+    constructor(protected testingRepository: TestingRepository) {}
+
     async deleteAllData (req: Request, res: Response) {
-        await testingRepository.clearDB()
+        await this.testingRepository.clearDB()
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 }

@@ -2,7 +2,7 @@ import {CommentDBType, CommentViewModel} from "../../types/comments.types";
 import {ObjectId, WithId} from "mongodb";
 import {CommentModel} from "../../entities/comment.entity";
 
-export const commentQueryRepo = {
+export class CommentQueryRepo {
     async getCommentsForPost(pageNumber: number,
                              pageSize: number,
                              sortBy: string,
@@ -21,21 +21,24 @@ export const commentQueryRepo = {
             .lean()
 
         return comments.map(this.mapToOutput)
-    },
+    }
+
     async getCommentsCount(postId: string): Promise<number> {
         const filter = {
             postId: postId,
         }
 
         return CommentModel.countDocuments(filter)
-    },
+    }
+
     async getCommentById(id: string): Promise<CommentViewModel | null> {
         const comment = await CommentModel.findOne({_id: new ObjectId(id)});
         if (!comment) {
             return null;
         }
         return this.mapToOutput(comment);
-    },
+    }
+
     mapToOutput(comment: WithId<CommentDBType>): CommentViewModel {
         return {
             id: comment._id.toString(),

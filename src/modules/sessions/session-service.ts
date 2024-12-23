@@ -1,4 +1,3 @@
-import {sessionRepository} from "./session-repository";
 import {createResult} from "../../helpers/result-function";
 import {Result} from "../../types/result.types";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
@@ -6,8 +5,12 @@ import {SessionDBType} from "../../types/sessions.types";
 import {jwtService} from "../../application/jwt-service";
 import {WithId} from "mongodb";
 import {SETTINGS} from "../../settings";
+import {SessionRepository} from "./session-repository";
 
-export const sessionService = {
+
+export class SessionService {
+    constructor(protected sessionRepository: SessionRepository ) {}
+
     async createSession(userId: string, deviceName: string, ip: string, refreshToken: string) {
         const tokenData = await jwtService.getTokenData(refreshToken, SETTINGS.REFRESH_SECRET)
 
@@ -20,17 +23,20 @@ export const sessionService = {
             exp: tokenData!.expDate
         }
 
-        return await sessionRepository.createSession(session);
-    },
+        return await this.sessionRepository.createSession(session);
+    }
+
     async updateTokenDate(refreshToken: string): Promise<boolean> {
         const tokenData = await jwtService.getTokenData(refreshToken, SETTINGS.REFRESH_SECRET)
-        return await sessionRepository.updateTokenDate(tokenData!.deviceId, tokenData!.iatDate, tokenData!.expDate)
-    },
+        return await this.sessionRepository.updateTokenDate(tokenData!.deviceId, tokenData!.iatDate, tokenData!.expDate)
+    }
+
     async terminateOtherSessions(userId: string, deviceId: string): Promise<boolean> {
-        return await sessionRepository.terminateOtherSessions(userId, deviceId);
-    },
+        return await this.sessionRepository.terminateOtherSessions(userId, deviceId);
+    }
+
     async terminateSessionByDeviceId(userId: string, deviceId: string): Promise<Result<null>> {
-        const session = await sessionRepository.findSessionByDeviceId(deviceId)
+        const session = await this.sessionRepository.findSessionByDeviceId(deviceId)
 
         if (!session) {
             return createResult(DomainStatusCode.NotFound)
@@ -40,10 +46,11 @@ export const sessionService = {
             return createResult(DomainStatusCode.Forbidden)
         }
 
-        await sessionRepository.terminateSessionByDeviceId(deviceId)
+        await this.sessionRepository.terminateSessionByDeviceId(deviceId)
         return createResult(DomainStatusCode.Success)
-    },
+    }
+
     async findSessionByDeviceId(deviceId: string): Promise<WithId<SessionDBType> | null> {
-        return await sessionRepository.findSessionByDeviceId(deviceId)
+        return await this.sessionRepository.findSessionByDeviceId(deviceId)
     }
 }

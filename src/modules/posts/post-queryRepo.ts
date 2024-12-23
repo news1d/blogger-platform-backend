@@ -3,7 +3,7 @@ import {ObjectId, WithId} from "mongodb";
 import {PostModel} from "../../entities/post.entity";
 
 
-export const postQueryRepo = {
+export class PostQueryRepo {
     async getPosts(pageNumber: number,
                    pageSize: number,
                    sortBy: string,
@@ -24,7 +24,8 @@ export const postQueryRepo = {
             .lean()
 
         return posts.map(this.mapToOutput)
-    },
+    }
+
     async getPostsCount(blogId?: string): Promise<number> {
         const filter: any = {}
 
@@ -33,14 +34,16 @@ export const postQueryRepo = {
         }
 
         return PostModel.countDocuments(filter)
-    },
+    }
+
     async getPostById(id: string): Promise<PostViewModel | null> {
         const post = await PostModel.findOne({_id: new ObjectId(id)});
         if (!post) {
             return null;
         }
         return this.mapToOutput(post);
-    },
+    }
+
     mapToOutput(post: WithId<PostDBType>): PostViewModel {
         return {
             id: post._id.toString(),

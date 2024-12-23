@@ -11,19 +11,19 @@ export type UserViewModel = {
     createdAt: string;
 }
 
-export type UserDBType = {
-    login: string;
-    email: string;
-    passwordHash: string;
-    passwordSalt: string;
-    createdAt: string;
-    emailConfirmation: {
-        confirmationCode: string | null;
-        expirationDate: Date | null;
-        isConfirmed: string;
-    },
-    passwordRecovery: {
-        recoveryCode: string | null,
-        expirationDate: Date | null;
-    }
+export class UserDBType {
+    constructor(public login: string,
+                public email: string,
+                public passwordHash: string,
+                public passwordSalt: string,
+                public createdAt: string,
+                public emailConfirmation: {
+                    confirmationCode: string | null;
+                    expirationDate: Date | null;
+                    isConfirmed: string;
+                },
+                public passwordRecovery: {
+                    recoveryCode: string | null;
+                    expirationDate: Date | null;
+                }) {}
 }

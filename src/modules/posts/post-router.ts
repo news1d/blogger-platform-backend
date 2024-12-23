@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {postController} from "./post-controller";
+import {postController} from "../../composition-root";
 import {accessTokenMiddleware, authMiddleware} from "../../middlewares/authorization-middleware";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {
@@ -11,18 +11,18 @@ import {
 
 export const postRouter = Router();
 
-postRouter.get('/', postController.getPosts)
+postRouter.get('/', postController.getPosts.bind(postController))
 postRouter.post('/', authMiddleware,
     postTitleValidator,
     postShortDescriptionValidator,
     postContentValidator,
     postBlogIdValidator,
     errorsResultMiddleware,
-    postController.createPost);
+    postController.createPost.bind(postController));
 postRouter.get('/:id',
     idValidator,
     errorsResultMiddleware,
-    postController.getPostById);
+    postController.getPostById.bind(postController));
 postRouter.put('/:id', authMiddleware,
     idValidator,
     postTitleValidator,
@@ -30,18 +30,18 @@ postRouter.put('/:id', authMiddleware,
     postContentValidator,
     postBlogIdValidator,
     errorsResultMiddleware,
-    postController.updatePostById);
+    postController.updatePostById.bind(postController));
 postRouter.delete('/:id', authMiddleware,
     idValidator,
     errorsResultMiddleware,
-    postController.deletePostById);
+    postController.deletePostById.bind(postController));
 
 postRouter.get('/:postId/comments',
     postIdValidator,
     errorsResultMiddleware,
-    postController.getCommentsByPostId)
+    postController.getCommentsByPostId.bind(postController))
 postRouter.post('/:postId/comments', accessTokenMiddleware,
     postIdValidator,
     commentContentValidator,
     errorsResultMiddleware,
-    postController.createCommentByPostId)
+    postController.createCommentByPostId.bind(postController))

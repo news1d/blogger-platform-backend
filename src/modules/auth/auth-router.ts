@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {authController} from "./auth-controller";
+import {authController} from "../../composition-root";
 import {
     userEmailValidator,
     userloginOrEmailValidator,
@@ -10,41 +10,40 @@ import {errorsResultMiddleware} from "../../validation/express-validator/errors-
 import {accessTokenMiddleware, refreshTokenMiddleware} from "../../middlewares/authorization-middleware";
 import {rateLimitMiddleware} from "../../middlewares/rate-limit-middleware";
 
-
 export const authRouter = Router();
 
 authRouter.post('/login', userloginOrEmailValidator,
     userPasswordValidator,
     errorsResultMiddleware,
     rateLimitMiddleware,
-    authController.login)
+    authController.login.bind(authController))
 authRouter.post('/password-recovery',
     userEmailValidator,
     errorsResultMiddleware,
     rateLimitMiddleware,
-    authController.passwordRecovery)
+    authController.passwordRecovery.bind(authController))
 authRouter.post('/new-password',
     userNewPasswordValidator,
     errorsResultMiddleware,
     rateLimitMiddleware,
-    authController.newPassword)
+    authController.newPassword.bind(authController))
 authRouter.post('/refresh-token', refreshTokenMiddleware,
-    authController.refreshToken)
+    authController.refreshToken.bind(authController))
 authRouter.post('/registration-confirmation',
     rateLimitMiddleware,
-    authController.registerConfirmation)
+    authController.registerConfirmation.bind(authController))
 authRouter.post('/registration',
     userLoginValidator,
     userPasswordValidator,
     userEmailValidator,
     errorsResultMiddleware,
     rateLimitMiddleware,
-    authController.registration)
+    authController.registration.bind(authController))
 authRouter.post('/registration-email-resending',
     userEmailValidator,
     rateLimitMiddleware,
-    authController.registerEmailResending)
+    authController.registerEmailResending.bind(authController))
 authRouter.post('/logout', refreshTokenMiddleware,
-    authController.logout)
+    authController.logout.bind(authController))
 authRouter.get('/me', accessTokenMiddleware,
-    authController.getUserInfo)
+    authController.getUserInfo.bind(authController))

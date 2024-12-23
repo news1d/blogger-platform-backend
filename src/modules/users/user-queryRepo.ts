@@ -3,7 +3,7 @@ import {UserDBType, UserViewModel} from "../../types/user.types";
 import {UserModel} from "../../entities/user.entity";
 
 
-export const userQueryRepo = {
+export class UserQueryRepo {
     async getUsers(pageNumber: number,
                    pageSize: number,
                    sortBy: string,
@@ -32,7 +32,8 @@ export const userQueryRepo = {
 
         return users.map(this.mapToOutput)
 
-    },
+    }
+
     async getUsersCount(searchLoginTerm: string | null, searchEmailTerm: string | null) {
         const filter: any[] = []
 
@@ -48,7 +49,8 @@ export const userQueryRepo = {
 
         return UserModel.countDocuments(query)
 
-    },
+    }
+
     async getUserById(id: string): Promise<UserViewModel | null> {
         const user = await UserModel.findOne({_id: new ObjectId(id)});
 
@@ -56,7 +58,8 @@ export const userQueryRepo = {
             return null;
         }
         return this.mapToOutput(user)
-    },
+    }
+
     mapToOutput(user: WithId<UserDBType>): UserViewModel {
         return {
             id: user._id.toString(),

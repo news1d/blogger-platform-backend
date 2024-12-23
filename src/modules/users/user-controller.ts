@@ -1,18 +1,20 @@
 import {Request, Response} from 'express';
 import {HTTP_STATUSES} from "../../helpers/http-statuses";
 import {userPaginationQueries} from "../../helpers/paginations-values";
-import {userQueryRepo} from "./user-queryRepo";
+import {UserQueryRepo} from "./user-queryRepo";
 import {UserInputModel, UserViewModel} from "../../types/user.types";
 import {OutputErrorsType} from "../../types/output-errors.type";
-import {userService} from "./user-service";
+import {UserService} from "./user-service";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
 
 
-export const userController = {
+export class UserController {
+    constructor(protected userService: UserService, protected userQueryRepo: UserQueryRepo) {}
+
     async getUsers(req: Request, res: Response) {
         const {pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm} = userPaginationQueries(req)
-        const users = await userQueryRepo.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm)
-        const usersCount = await userQueryRepo.getUsersCount(searchLoginTerm, searchEmailTerm)
+        const users = await this.userQueryRepo.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm)
+        const usersCount = await this.userQueryRepo.getUsersCount(searchLoginTerm, searchEmailTerm)
 
         res.status(HTTP_STATUSES.OK_200).json({
             pagesCount: Math.ceil(usersCount/pageSize),
@@ -21,9 +23,10 @@ export const userController = {
             totalCount: usersCount,
             items: users
         })
-    },
+    }
+
     async createUser(req: Request<any, any, UserInputModel>, res: Response<UserViewModel | null | OutputErrorsType>) {
-        const result = await userService.createUser(req.body)
+        const result = await this.userService.createUser(req.body)
 
         if (result.status !== DomainStatusCode.Success) {
             res.status(HTTP_STATUSES.BAD_REQUEST_400).json({errorsMessages: result.errorsMessages})
@@ -31,12 +34,13 @@ export const userController = {
         }
 
         const userId = result.data!
-        const user = await userQueryRepo.getUserById(userId)
+        const user = await this.userQueryRepo.getUserById(userId)
 
         res.status(HTTP_STATUSES.CREATED_201).json(user)
-    },
+    }
+
     async deleteUserById(req: Request<{id: string}>, res: Response) {
-        const isDeleted = await userService.deleteUserById(req.params.id)
+        const isDeleted = await this.userService.deleteUserById(req.params.id)
 
         if (isDeleted) {
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);

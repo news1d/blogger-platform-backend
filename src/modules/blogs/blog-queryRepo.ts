@@ -2,7 +2,7 @@ import {BlogDBType, BlogViewModel} from "../../types/blog.types";
 import { WithId, ObjectId} from "mongodb";
 import {BlogModel} from "../../entities/blog.entity";
 
-export const blogQueryRepo = {
+export class BlogQueryRepo {
     async getBlogs(pageNumber: number,
                    pageSize: number,
                    sortBy: string,
@@ -23,7 +23,8 @@ export const blogQueryRepo = {
             .lean()
 
         return blogs.map(this.mapToOutput)
-    },
+    }
+
     async getBlogsCount(serchNameTerm: string | null): Promise<number> {
         const filter: any = {}
 
@@ -32,7 +33,8 @@ export const blogQueryRepo = {
         }
 
         return BlogModel.countDocuments(filter)
-    },
+    }
+
     async getBlogById(id: string): Promise<BlogViewModel | null>{
         const blog = await BlogModel.findOne({_id: new ObjectId(id)});
 
@@ -40,7 +42,8 @@ export const blogQueryRepo = {
             return null;
         }
         return this.mapToOutput(blog);
-    },
+    }
+
     mapToOutput(blog: WithId<BlogDBType>): BlogViewModel {
         return {
             id: blog._id.toString(),

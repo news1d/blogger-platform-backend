@@ -3,11 +3,12 @@ import {ObjectId} from "mongodb";
 import {PostModel} from "../../entities/post.entity";
 
 
-export const postRepository = {
+export class PostRepository {
     async createPost(post: PostDBType): Promise<string>{
         const result = await PostModel.create(post);
         return result._id.toString();
-    },
+    }
+
     async updatePostById(id: string, blogName: string, body: PostInputModel): Promise<boolean> {
         const result = await PostModel.updateOne({_id: new ObjectId(id)}, {$set: {
                 title: body.title,
@@ -18,7 +19,8 @@ export const postRepository = {
             }})
 
         return result.matchedCount === 1;
-    },
+    }
+
     async deletePostById(id: string): Promise<boolean>{
         const result = await PostModel.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
