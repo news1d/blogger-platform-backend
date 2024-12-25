@@ -69,3 +69,18 @@ export const refreshTokenMiddleware = async (req: Request, res: Response, next: 
     req.userId = session.userId;
     next();
 }
+
+export const getAccessTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.headers.authorization) {
+        return next();
+    }
+
+    const token = req.headers.authorization.split(' ')[1]
+    const userId = await jwtService.getUserIdByToken(token, SETTINGS.JWT_SECRET)
+
+    if (userId) {
+        req.userId = userId
+    }
+
+    next();
+}
