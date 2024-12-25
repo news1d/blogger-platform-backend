@@ -422,12 +422,14 @@ describe('comments', () => {
 
         const createdComment = response.body
 
+        // Ставим лайк
         await request(app)
             .put(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}/like-status`)
             .set(bearerAuth(accessToken))
             .send({likeStatus: LikeStatus.Like})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
+        // Получаем данные о комментарии
         const commentDataResponse = await request(app)
             .get(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}`)
             .set(bearerAuth(accessToken))
@@ -438,5 +440,60 @@ describe('comments', () => {
         expect(commentData.likesInfo.likesCount).toEqual(1)
         expect(commentData.likesInfo.dislikesCount).toEqual(0)
         expect(commentData.likesInfo.myStatus).toEqual(LikeStatus.Like)
+    })
+
+    it('shouldn`t update like status with incorrect data ', async () => {
+        // Добавляем пользователя
+        const userData = {
+            login: 'incubator',
+            password: 'password1',
+            email: 'incubator@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'incubator',
+            password: 'password1',
+        }
+
+        const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        // Добавляем пост
+        const postData = await createPostData();
+        const createResponse = await postsTestManager.createPost(postData.validData)
+        const createdPost = createResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdPost)
+
+        // Добавляем комментарий к посту
+        const comment = {
+            content: 'test test test test test'
+        }
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .set(bearerAuth(accessToken))
+            .send(comment)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createdComment = response.body
+
+        // Пытаемся установить недопустимый статус
+        const errorResponse = await request(app)
+            .put(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}/like-status`)
+            .set(bearerAuth(accessToken))
+            .send({likeStatus: 'SuperLike'})
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+        expect(errorResponse.body.errorsMessages[0].field).toBe('likeStatus');
+        expect(errorResponse.body.errorsMessages[0].message).toEqual(expect.any(String));
     })
 })
