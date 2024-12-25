@@ -1,6 +1,7 @@
 import {CommentDBType, CommentViewModel} from "../../types/comments.types";
 import {ObjectId, WithId} from "mongodb";
 import {CommentModel} from "../../entities/comment.entity";
+import {LikeStatus} from "../../types/like.types";
 
 export class CommentQueryRepo {
     async getCommentsForPost(pageNumber: number,
@@ -48,6 +49,11 @@ export class CommentQueryRepo {
                 userLogin: comment.commentatorInfo.userLogin
             },
             createdAt: comment.createdAt,
+            likesInfo: {
+                likesCount: comment.likesCount,
+                dislikesCount: comment.dislikesCount,
+                myStatus: LikeStatus.None
+            }
         }
     }
 }
