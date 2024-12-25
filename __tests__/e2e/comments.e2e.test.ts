@@ -5,6 +5,7 @@ import {SETTINGS} from "../../src/settings";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 import {bearerAuth, createPostData, postsTestManager, usersTestManager} from "../test-helpers";
 import mongoose from "mongoose";
+import {LikeStatus} from "../../src/types/like.types";
 
 
 describe('comments', () => {
@@ -326,5 +327,115 @@ describe('comments', () => {
                     }
                 ]
             })
+    })
+
+    it('should have like status None', async () => {
+        // Добавляем пользователя
+        const userData = {
+            login: 'chikkgeek',
+            password: 'password1',
+            email: 'chikkgeek@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'chikkgeek',
+            password: 'password1',
+        }
+
+        const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        // Добавляем пост
+        const postData = await createPostData();
+        const createResponse = await postsTestManager.createPost(postData.validData)
+        const createdPost = createResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdPost)
+
+        // Добавляем комментарий к посту
+        const comment = {
+            content: 'going brrrr going brrrr'
+        }
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .set(bearerAuth(accessToken))
+            .send(comment)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createdComment = response.body
+
+        expect(createdComment.likesInfo.likesCount).toEqual(0)
+        expect(createdComment.likesInfo.dislikesCount).toEqual(0)
+        expect(createdComment.likesInfo.myStatus).toEqual(LikeStatus.None)
+    })
+
+    it('should change the number of likes', async () => {
+        // Добавляем пользователя
+        const userData = {
+            login: 'gingerboy',
+            password: 'password1',
+            email: 'gingerboy@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'gingerboy',
+            password: 'password1',
+        }
+
+        const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        // Добавляем пост
+        const postData = await createPostData();
+        const createResponse = await postsTestManager.createPost(postData.validData)
+        const createdPost = createResponse.body
+
+        await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdPost)
+
+        // Добавляем комментарий к посту
+        const comment = {
+            content: 'ginger cookies ginger cookies'
+        }
+
+        const response = await request(app)
+            .post(`${SETTINGS.PATH.POSTS}/${createdPost.id}/comments`)
+            .set(bearerAuth(accessToken))
+            .send(comment)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createdComment = response.body
+
+        await request(app)
+            .put(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}/like-status`)
+            .set(bearerAuth(accessToken))
+            .send({likeStatus: LikeStatus.Like})
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        const commentDataResponse = await request(app)
+            .get(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}`)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const commentData = commentDataResponse.body
+
+        expect(commentData.likesInfo.likesCount).toEqual(1)
+        expect(commentData.likesInfo.dislikesCount).toEqual(0)
+        expect(commentData.likesInfo.myStatus).toEqual(LikeStatus.None)
     })
 })
