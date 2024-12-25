@@ -8,7 +8,8 @@ export class CommentQueryRepo {
                              pageSize: number,
                              sortBy: string,
                              sortDirection: 'asc' | 'desc',
-                             postId: string): Promise<CommentViewModel[]> {
+                             postId: string,
+                             userId?: string | null): Promise<CommentViewModel[]> {
 
         const filter = {
             postId: postId,
@@ -21,7 +22,7 @@ export class CommentQueryRepo {
             .limit(pageSize)
             .lean()
 
-        return comments.map(this.mapToOutput)
+        return comments.map(comment => this.mapToOutput(comment, userId));
     }
 
     async getCommentsCount(postId: string): Promise<number> {
@@ -32,15 +33,19 @@ export class CommentQueryRepo {
         return CommentModel.countDocuments(filter)
     }
 
-    async getCommentById(id: string): Promise<CommentViewModel | null> {
+    async getCommentById(id: string, userId?: string | null): Promise<CommentViewModel | null> {
         const comment = await CommentModel.findOne({_id: new ObjectId(id)});
         if (!comment) {
             return null;
         }
-        return this.mapToOutput(comment);
+        return this.mapToOutput(comment, userId);
     }
 
-    mapToOutput(comment: WithId<CommentDBType>): CommentViewModel {
+    mapToOutput(comment: WithId<CommentDBType>, userId?: string | null): CommentViewModel {
+        const myStatus = userId
+            ? comment.likes.find(like => like.authorId === userId)?.status || LikeStatus.None
+            : LikeStatus.None;
+
         return {
             id: comment._id.toString(),
             content: comment.content,
@@ -52,7 +57,7 @@ export class CommentQueryRepo {
             likesInfo: {
                 likesCount: comment.likesCount,
                 dislikesCount: comment.dislikesCount,
-                myStatus: LikeStatus.None
+                myStatus: myStatus
             }
         }
     }
