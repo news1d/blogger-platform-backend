@@ -378,7 +378,7 @@ describe('comments', () => {
         expect(createdComment.likesInfo.myStatus).toEqual(LikeStatus.None)
     })
 
-    it('should change the number of likes', async () => {
+    it('should change the number of likes and likeStatus', async () => {
         // Добавляем пользователя
         const userData = {
             login: 'gingerboy',
@@ -430,12 +430,13 @@ describe('comments', () => {
 
         const commentDataResponse = await request(app)
             .get(`${SETTINGS.PATH.COMMENTS}/${createdComment.id}`)
+            .set(bearerAuth(accessToken))
             .expect(HTTP_STATUSES.OK_200)
 
         const commentData = commentDataResponse.body
 
         expect(commentData.likesInfo.likesCount).toEqual(1)
         expect(commentData.likesInfo.dislikesCount).toEqual(0)
-        expect(commentData.likesInfo.myStatus).toEqual(LikeStatus.None)
+        expect(commentData.likesInfo.myStatus).toEqual(LikeStatus.Like)
     })
 })
