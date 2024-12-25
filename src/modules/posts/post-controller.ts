@@ -77,7 +77,7 @@ export class PostController {
 
         if (post) {
             const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req)
-            const comments = await this.commentQueryRepo.getCommentsForPost(pageNumber, pageSize, sortBy, sortDirection, post.id)
+            const comments = await this.commentQueryRepo.getCommentsForPost(pageNumber, pageSize, sortBy, sortDirection, post.id, req.userId)
             const commentsCount = await this.commentQueryRepo.getCommentsCount(post.id)
             res.status(HTTP_STATUSES.OK_200).json({
                 pagesCount: Math.ceil(commentsCount/pageSize),

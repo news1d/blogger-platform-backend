@@ -11,7 +11,7 @@ export class CommentController {
     constructor(protected commentService: CommentService, protected commentQueryRepo: CommentQueryRepo) {}
 
     async getCommentById(req: Request<{id: string}>, res: Response<CommentViewModel>) {
-        const comment = await this.commentQueryRepo.getCommentById(req.params.id);
+        const comment = await this.commentQueryRepo.getCommentById(req.params.id, req.userId);
 
         if (!comment) {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
