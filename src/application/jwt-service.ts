@@ -5,14 +5,14 @@ import {v4 as uuidv4} from "uuid";
 
 export const jwtService = {
     async createJWT(userId: string): Promise<string>{
-        return jwt.sign({userId: new ObjectId(userId), unique: Date.now()}, SETTINGS.JWT_SECRET, {expiresIn: "10s"})
+        return jwt.sign({userId: new ObjectId(userId), unique: Date.now()}, SETTINGS.JWT_SECRET, {expiresIn: "5m"})
     },
     async createRT(userId: string): Promise<string>{
         const deviceId = uuidv4();
-        return jwt.sign({userId: new ObjectId(userId), unique: Date.now(), deviceId: deviceId}, SETTINGS.REFRESH_SECRET, {expiresIn: "20s"});
+        return jwt.sign({userId: new ObjectId(userId), unique: Date.now(), deviceId: deviceId}, SETTINGS.REFRESH_SECRET, {expiresIn: "10m"});
     },
     async updateRT(userId: string, deviceId: string): Promise<string>{
-        return jwt.sign({userId: new ObjectId(userId), unique: Date.now(), deviceId: deviceId}, SETTINGS.REFRESH_SECRET, {expiresIn: "20s"});
+        return jwt.sign({userId: new ObjectId(userId), unique: Date.now(), deviceId: deviceId}, SETTINGS.REFRESH_SECRET, {expiresIn: "10m"});
     },
     async getUserIdByToken(token: string, secret_phrase: string) {
         try {
