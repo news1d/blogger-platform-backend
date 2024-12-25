@@ -3,6 +3,7 @@ import {Result} from "../../types/result.types";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
 import {createResult} from "../../helpers/result-function";
 import {CommentRepository} from "./comment-repository";
+import {LikeStatus} from "../../types/like.types";
 
 
 export class CommentService {
@@ -18,6 +19,22 @@ export class CommentService {
         const isUpdated = await this.commentRepository.updateCommentById(commentId, body);
 
         if (isUpdated ) {
+            return createResult(DomainStatusCode.Success)
+        } else {
+            return createResult(DomainStatusCode.NotFound)
+        }
+    }
+
+    async updateLikeStatus(commentId: string, userId: string, likeStatus: LikeStatus): Promise<Result<null>> {
+        const isUpdated = await this.commentRepository.updateLikeStatus(commentId, userId, likeStatus)
+
+        if (!isUpdated ) {
+            return createResult(DomainStatusCode.NotFound)
+        }
+
+        const isRecalculated = await this.commentRepository.updateLikesCounters(commentId)
+
+        if (isRecalculated) {
             return createResult(DomainStatusCode.Success)
         } else {
             return createResult(DomainStatusCode.NotFound)

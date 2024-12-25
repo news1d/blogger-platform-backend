@@ -4,6 +4,7 @@ import {CommentInputModel, CommentViewModel} from "../../types/comments.types";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
 import {CommentService} from "./comment-service";
 import {CommentQueryRepo} from "./comment-queryRepo";
+import {LikeInputModel} from "../../types/like.types";
 
 
 export class CommentController {
@@ -30,6 +31,19 @@ export class CommentController {
 
         if (result.status === DomainStatusCode.Forbidden){
             res.sendStatus(HTTP_STATUSES.FORBIDDEN_403);
+            return;
+        }
+
+        if (result.status === DomainStatusCode.Success) {
+            res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+        }
+    }
+
+    async updateLikeStatus(req: Request<{commentId: string}, any, LikeInputModel>, res: Response) {
+        const result = await this.commentService.updateLikeStatus(req.params.commentId, req.userId!, req.body.likeStatus)
+
+        if (result.status === DomainStatusCode.NotFound){
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
             return;
         }
 
