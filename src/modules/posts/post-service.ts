@@ -30,7 +30,10 @@ export class PostService {
                 userLogin: user!.login
             },
             createdAt: new Date().toISOString(),
-            postId: postId
+            postId: postId,
+            likes: [],
+            likesCount: 0,
+            dislikesCount: 0
         }
 
         return await this.commentRepository.createComment(comment);
