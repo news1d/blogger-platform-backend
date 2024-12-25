@@ -1,6 +1,10 @@
 import {Router} from "express";
 import {postController} from "../../composition-root";
-import {accessTokenMiddleware, authMiddleware} from "../../middlewares/authorization-middleware";
+import {
+    accessTokenMiddleware,
+    authMiddleware,
+    getAccessTokenMiddleware
+} from "../../middlewares/authorization-middleware";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {
     postBlogIdValidator, commentContentValidator,
@@ -37,6 +41,7 @@ postRouter.delete('/:id', authMiddleware,
     postController.deletePostById.bind(postController));
 
 postRouter.get('/:postId/comments',
+    getAccessTokenMiddleware,
     postIdValidator,
     errorsResultMiddleware,
     postController.getCommentsByPostId.bind(postController))

@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {accessTokenMiddleware} from "../../middlewares/authorization-middleware";
+import {accessTokenMiddleware, getAccessTokenMiddleware} from "../../middlewares/authorization-middleware";
 import {
     commentContentValidator,
     commentIdValidator, commentLikeStatusValidator,
@@ -12,6 +12,7 @@ import {commentController} from "../../composition-root";
 export const commentRouter = Router()
 
 commentRouter.get('/:id',
+    getAccessTokenMiddleware,
     idValidator,
     errorsResultMiddleware,
     commentController.getCommentById.bind(commentController))
