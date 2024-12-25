@@ -1,5 +1,6 @@
 import {body, param} from "express-validator";
 import {blogQueryRepo} from "../../composition-root";
+import {LikeStatus} from "../../types/like.types";
 
 export const idValidator = param('id')
         .isMongoId()
@@ -135,3 +136,10 @@ export const commentContentValidator = body('content')
     .isLength({ min: 20, max: 300 })
     .withMessage('Content should contain 20-300 characters.')
 
+export const commentLikeStatusValidator = body('likeStatus')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('Please enter a like status.')
+    .isIn(Object.values(LikeStatus))
+    .withMessage(`likeStatus must be one of: ${Object.values(LikeStatus).join(', ')}`);
