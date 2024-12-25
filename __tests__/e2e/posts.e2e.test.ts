@@ -417,7 +417,12 @@ describe('/posts', () => {
                 userId: expect.any(String),
                 userLogin: userData.login,
             },
-            createdAt: expect.any(String)
+            createdAt: expect.any(String),
+            likesInfo: {
+                dislikesCount: 0,
+                likesCount: 0,
+                myStatus: "None",
+            }
         })
     })
 
