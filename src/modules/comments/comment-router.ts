@@ -2,7 +2,7 @@ import {Router} from "express";
 import {accessTokenMiddleware} from "../../middlewares/authorization-middleware";
 import {
     commentContentValidator,
-    commentIdValidator,
+    commentIdValidator, commentLikeStatusValidator,
     idValidator
 } from "../../validation/express-validator/field-validators";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
@@ -20,6 +20,10 @@ commentRouter.put('/:commentId', accessTokenMiddleware,
     commentContentValidator,
     errorsResultMiddleware,
     commentController.updateCommentById.bind(commentController))
+commentRouter.put('/:commentId/like-status', accessTokenMiddleware,
+    commentIdValidator,
+    commentLikeStatusValidator,
+    commentController.updateLikeStatus.bind(commentController))
 commentRouter.delete('/:commentId', accessTokenMiddleware,
     commentIdValidator,
     errorsResultMiddleware,
