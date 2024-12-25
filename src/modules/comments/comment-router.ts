@@ -24,6 +24,7 @@ commentRouter.put('/:commentId', accessTokenMiddleware,
 commentRouter.put('/:commentId/like-status', accessTokenMiddleware,
     commentIdValidator,
     commentLikeStatusValidator,
+    errorsResultMiddleware,
     commentController.updateLikeStatus.bind(commentController))
 commentRouter.delete('/:commentId', accessTokenMiddleware,
     commentIdValidator,
