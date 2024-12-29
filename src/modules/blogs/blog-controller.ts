@@ -6,12 +6,13 @@ import {PostInputModel, PostViewModel} from "../../types/post.types";
 import {BlogService} from "./blog-service";
 import {BlogQueryRepo} from "./blog-queryRepo";
 import {PostQueryRepo} from "../posts/post-queryRepo";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class BlogController {
-    constructor(protected blogService: BlogService,
-                protected blogQueryRepo: BlogQueryRepo,
-                protected postQueryRepo: PostQueryRepo) {}
+    constructor(@inject(BlogService) protected blogService: BlogService,
+                @inject(BlogQueryRepo) protected blogQueryRepo: BlogQueryRepo,
+                @inject(PostQueryRepo) protected postQueryRepo: PostQueryRepo) {}
 
     async getBlogs (req: Request, res: Response) {
         const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm} = paginationQueries(req)

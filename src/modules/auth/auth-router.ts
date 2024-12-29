@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {authController} from "../../composition-root";
+import {container} from "../../composition-root";
 import {
     userEmailValidator,
     userloginOrEmailValidator,
@@ -9,6 +9,9 @@ import {
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {accessTokenMiddleware, refreshTokenMiddleware} from "../../middlewares/authorization-middleware";
 import {rateLimitMiddleware} from "../../middlewares/rate-limit-middleware";
+import {AuthController} from "./auth-controller";
+
+const authController = container.resolve(AuthController);
 
 export const authRouter = Router();
 

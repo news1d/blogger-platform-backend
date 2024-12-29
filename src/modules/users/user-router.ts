@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {userController} from "../../composition-root";
+import {container} from "../../composition-root";
 import {authMiddleware} from "../../middlewares/authorization-middleware";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {validateUserQueryParams} from "../../validation/express-validator/query-validators";
@@ -9,6 +9,9 @@ import {
     userLoginValidator,
     userPasswordValidator
 } from "../../validation/express-validator/field-validators";
+import {UserController} from "./user-controller";
+
+const userController = container.resolve(UserController)
 
 export const userRouter = Router()
 

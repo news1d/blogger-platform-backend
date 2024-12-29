@@ -4,10 +4,11 @@ import {DomainStatusCode} from "../../helpers/domain-status-code";
 import {createResult} from "../../helpers/result-function";
 import {CommentRepository} from "./comment-repository";
 import {LikeStatus} from "../../types/like.types";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class CommentService {
-    constructor(protected commentRepository: CommentRepository) {}
+    constructor(@inject(CommentRepository) protected commentRepository: CommentRepository) {}
 
     async updateCommentById(commentId: string, userId: string, body: CommentInputModel): Promise<Result<null>>{
         const result = await this.ownerVerification(commentId, userId)

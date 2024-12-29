@@ -5,9 +5,12 @@ import {jwtService} from "../../application/jwt-service";
 import {SETTINGS} from "../../settings";
 import {SessionService} from "./session-service";
 import {SessionQueryRepo} from "./session-queryRepo";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class SessionController {
-    constructor(protected sessionService: SessionService, protected sessionQueryRepo: SessionQueryRepo ) {}
+    constructor(@inject(SessionService) protected sessionService: SessionService,
+                @inject(SessionQueryRepo)protected sessionQueryRepo: SessionQueryRepo ) {}
 
     async getSessions(req: Request, res: Response) {
         const sessions = await this.sessionQueryRepo.getSessions(req.userId!)

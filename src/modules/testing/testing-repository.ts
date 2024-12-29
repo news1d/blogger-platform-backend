@@ -5,7 +5,9 @@ import {CommentModel} from "../../entities/comment.entity";
 import {BlacklistModel} from "../../entities/blacklist.entity";
 import {SessionModel} from "../../entities/session.entity";
 import {RequestModel} from "../../entities/request.entity";
+import {injectable} from "inversify";
 
+@injectable()
 export class TestingRepository {
     async clearDB() {
         await BlogModel.deleteMany({});

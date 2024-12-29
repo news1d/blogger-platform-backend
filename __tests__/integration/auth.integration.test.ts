@@ -4,7 +4,12 @@ import {DomainStatusCode} from "../../src/helpers/domain-status-code";
 import {testSeeder} from "./test.seeder";
 import mongoose from "mongoose";
 import {SETTINGS} from "../../src/settings";
-import {authService, userService} from "../../src/composition-root";
+import {container} from "../../src/composition-root";
+import {UserService} from "../../src/modules/users/user-service";
+import {AuthService} from "../../src/modules/auth/auth-service";
+
+const authService = container.resolve(AuthService);
+const userService = container.resolve(UserService);
 
 
 describe('/auth-integration', () => {

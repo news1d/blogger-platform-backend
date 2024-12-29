@@ -1,8 +1,9 @@
 import {PostDBType, PostInputModel} from "../../types/post.types";
 import {ObjectId} from "mongodb";
 import {PostModel} from "../../entities/post.entity";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class PostRepository {
     async createPost(post: PostDBType): Promise<string>{
         const result = await PostModel.create(post);

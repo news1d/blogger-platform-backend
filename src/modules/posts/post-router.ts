@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {postController} from "../../composition-root";
+import {container} from "../../composition-root";
 import {
     accessTokenMiddleware,
     authMiddleware,
@@ -12,6 +12,9 @@ import {
     postShortDescriptionValidator,
     postTitleValidator, idValidator, postIdValidator
 } from "../../validation/express-validator/field-validators";
+import {PostController} from "./post-controller";
+
+const postController = container.resolve(PostController);
 
 export const postRouter = Router();
 

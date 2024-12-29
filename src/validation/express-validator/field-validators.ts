@@ -1,6 +1,9 @@
 import {body, param} from "express-validator";
-import {blogQueryRepo} from "../../composition-root";
 import {LikeStatus} from "../../types/like.types";
+import {BlogQueryRepo} from "../../modules/blogs/blog-queryRepo";
+import {container} from "../../composition-root";
+
+const blogQueryRepo = container.resolve(BlogQueryRepo);
 
 export const idValidator = param('id')
         .isMongoId()

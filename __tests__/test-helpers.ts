@@ -5,7 +5,10 @@ import request from 'supertest';
 import {app} from "../src/app";
 import {SETTINGS} from "../src/settings";
 import {HTTP_STATUSES} from "../src/helpers/http-statuses";
-import {blogQueryRepo} from "../src/composition-root";
+import {container} from "../src/composition-root";
+import {BlogQueryRepo} from "../src/modules/blogs/blog-queryRepo";
+
+const blogQueryRepo = container.resolve(BlogQueryRepo)
 
 const codedAuth = 'YWRtaW46cXdlcnR5'
 export const authData = {'Authorization': 'Basic '+ codedAuth}

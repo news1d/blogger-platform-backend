@@ -1,8 +1,9 @@
 import {ObjectId, WithId} from "mongodb";
 import {UserDBType, UserViewModel} from "../../types/user.types";
 import {UserModel} from "../../entities/user.entity";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class UserQueryRepo {
     async getUsers(pageNumber: number,
                    pageSize: number,

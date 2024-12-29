@@ -6,8 +6,10 @@ import {
     idValidator
 } from "../../validation/express-validator/field-validators";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
-import {commentController} from "../../composition-root";
+import {CommentController} from "./comment-controller";
+import {container} from "../../composition-root";
 
+const commentController = container.resolve(CommentController);
 
 export const commentRouter = Router()
 

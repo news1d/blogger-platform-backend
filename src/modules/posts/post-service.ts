@@ -3,10 +3,13 @@ import {CommentDBType, CommentInputModel} from "../../types/comments.types";
 import {UserRepository} from "../users/user-repository";
 import {PostRepository} from "./post-repository";
 import {CommentRepository} from "../comments/comment-repository";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class PostService {
-    constructor(protected postRepository: PostRepository, protected userRepository: UserRepository, protected commentRepository: CommentRepository) {}
+    constructor(@inject(PostRepository) protected postRepository: PostRepository,
+                @inject(UserRepository) protected userRepository: UserRepository,
+                @inject(CommentRepository) protected commentRepository: CommentRepository) {}
 
     async createPost(blogName: string, body: PostInputModel): Promise<string>{
         const post: PostDBType = {

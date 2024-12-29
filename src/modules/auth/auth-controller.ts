@@ -16,9 +16,13 @@ import {OutputErrorsType} from "../../types/output-errors.type";
 import {blacklistService} from "../../blacklist/blacklist-service";
 import {SETTINGS} from "../../settings";
 import {SessionService} from "../sessions/session-service";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class AuthController {
-    constructor(protected authService: AuthService, protected userService: UserService, protected sessionService: SessionService ) {}
+    constructor(@inject(AuthService) protected authService: AuthService,
+                @inject(UserService) protected userService: UserService,
+                @inject(SessionService) protected sessionService: SessionService) {}
 
     async login(req: Request<any, any, LoginInputModel>, res: Response<LoginSuccessViewModel>){
         const userId = await this.userService.checkCredentials(req.body.loginOrEmail, req.body.password)

@@ -2,7 +2,9 @@ import {CommentDBType, CommentInputModel} from "../../types/comments.types";
 import {ObjectId} from "mongodb";
 import {CommentModel} from "../../entities/comment.entity";
 import {LikeStatus} from "../../types/like.types";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentRepository {
     async createComment(comment: CommentDBType): Promise<string> {
         const result = await CommentModel.create(comment);

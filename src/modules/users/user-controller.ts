@@ -6,10 +6,12 @@ import {UserInputModel, UserViewModel} from "../../types/user.types";
 import {OutputErrorsType} from "../../types/output-errors.type";
 import {UserService} from "./user-service";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class UserController {
-    constructor(protected userService: UserService, protected userQueryRepo: UserQueryRepo) {}
+    constructor(@inject(UserService) protected userService: UserService,
+                @inject(UserQueryRepo) protected userQueryRepo: UserQueryRepo) {}
 
     async getUsers(req: Request, res: Response) {
         const {pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm} = userPaginationQueries(req)

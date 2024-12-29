@@ -5,8 +5,10 @@ import {clearDB} from "../../src/db/mongoDb";
 import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 import {authData, blogData, blogsTestManager, createPostData, postsTestManager} from "../test-helpers";
 import mongoose from "mongoose";
-import {blogQueryRepo} from "../../src/composition-root";
+import {container} from "../../src/composition-root";
+import {BlogQueryRepo} from "../../src/modules/blogs/blog-queryRepo";
 
+const blogQueryRepo = container.resolve(BlogQueryRepo);
 
 describe('/blogs', () => {
     beforeAll(async () => {

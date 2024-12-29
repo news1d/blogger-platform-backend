@@ -4,9 +4,11 @@ import {UserRepository} from "./user-repository";
 import {Result} from "../../types/result.types";
 import {DomainStatusCode} from "../../helpers/domain-status-code";
 import {createResult} from "../../helpers/result-function";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class UserService {
-    constructor(protected userRepository: UserRepository) {}
+    constructor(@inject(UserRepository) protected userRepository: UserRepository) {}
 
     async createUser(body: UserInputModel): Promise<Result<string | null>>{
         const result = await this.checkUnique(body.login, body.email);

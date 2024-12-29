@@ -7,13 +7,14 @@ import {PostService} from "./post-service";
 import {PostQueryRepo} from "./post-queryRepo";
 import {BlogQueryRepo} from "../blogs/blog-queryRepo";
 import {CommentQueryRepo} from "../comments/comment-queryRepo";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class PostController {
-    constructor(protected postService: PostService,
-                protected postQueryRepo: PostQueryRepo,
-                protected blogQueryRepo: BlogQueryRepo,
-                protected commentQueryRepo: CommentQueryRepo) {}
+    constructor(@inject(PostService) protected postService: PostService,
+                @inject(PostQueryRepo) protected postQueryRepo: PostQueryRepo,
+                @inject(BlogQueryRepo) protected blogQueryRepo: BlogQueryRepo,
+                @inject(CommentQueryRepo) protected commentQueryRepo: CommentQueryRepo) {}
 
     async getPosts (req: Request, res: Response) {
         const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req)

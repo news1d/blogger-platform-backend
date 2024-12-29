@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {blogController} from "../../composition-root";
+import {container} from "../../composition-root";
 import {
     blogDescriptionValidator, blogIdValidator,
     blogNameValidator,
@@ -11,6 +11,9 @@ import {
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
 import {authMiddleware} from "../../middlewares/authorization-middleware";
 import {validateBlogQueryParams} from "../../validation/express-validator/query-validators";
+import {BlogController} from "./blog-controller";
+
+const blogController = container.resolve(BlogController)
 
 export const blogRouter = Router();
 

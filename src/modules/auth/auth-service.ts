@@ -10,10 +10,12 @@ import {nodemailerService} from "../../application/nodemailer-service";
 import {emailExamples} from "../../helpers/email-examples";
 import {MeViewModel} from "../../types/auth.types";
 import {UserService} from "../users/user-service";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class AuthService {
-    constructor(protected userRepository: UserRepository, protected userService: UserService) {}
+    constructor(@inject(UserRepository) protected userRepository: UserRepository,
+                @inject(UserService) protected userService: UserService) {}
 
     async getMyInfo(userId: string): Promise<MeViewModel | null> {
         const user = await this.userRepository.getUserById(userId);

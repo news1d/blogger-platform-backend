@@ -1,7 +1,9 @@
 import {WithId} from "mongodb";
 import {SessionDBType} from "../../types/sessions.types";
 import {SessionModel} from "../../entities/session.entity";
+import {injectable} from "inversify";
 
+@injectable()
 export class SessionRepository {
     async createSession(sessions: SessionDBType): Promise<string> {
         const result = await SessionModel.create(sessions);

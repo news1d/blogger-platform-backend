@@ -1,7 +1,9 @@
 import {BlogDBType, BlogInputModel} from "../../types/blog.types";
 import {ObjectId} from "mongodb";
 import {BlogModel} from "../../entities/blog.entity";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogRepository {
     async createBlog(blog: BlogDBType): Promise<string> {
         const result = await BlogModel.create(blog);

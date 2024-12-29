@@ -5,10 +5,12 @@ import {DomainStatusCode} from "../../helpers/domain-status-code";
 import {CommentService} from "./comment-service";
 import {CommentQueryRepo} from "./comment-queryRepo";
 import {LikeInputModel} from "../../types/like.types";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class CommentController {
-    constructor(protected commentService: CommentService, protected commentQueryRepo: CommentQueryRepo) {}
+    constructor(@inject(CommentService) protected commentService: CommentService,
+                @inject(CommentQueryRepo) protected commentQueryRepo: CommentQueryRepo) {}
 
     async getCommentById(req: Request<{id: string}>, res: Response<CommentViewModel>) {
         const comment = await this.commentQueryRepo.getCommentById(req.params.id, req.userId);

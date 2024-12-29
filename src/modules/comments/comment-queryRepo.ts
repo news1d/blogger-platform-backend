@@ -2,7 +2,9 @@ import {CommentDBType, CommentViewModel} from "../../types/comments.types";
 import {ObjectId, WithId} from "mongodb";
 import {CommentModel} from "../../entities/comment.entity";
 import {LikeStatus} from "../../types/like.types";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentQueryRepo {
     async getCommentsForPost(pageNumber: number,
                              pageSize: number,

@@ -1,7 +1,9 @@
 import {BlogDBType, BlogViewModel} from "../../types/blog.types";
 import { WithId, ObjectId} from "mongodb";
 import {BlogModel} from "../../entities/blog.entity";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogQueryRepo {
     async getBlogs(pageNumber: number,
                    pageSize: number,

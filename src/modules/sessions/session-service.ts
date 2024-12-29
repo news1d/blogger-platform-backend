@@ -6,10 +6,11 @@ import {jwtService} from "../../application/jwt-service";
 import {WithId} from "mongodb";
 import {SETTINGS} from "../../settings";
 import {SessionRepository} from "./session-repository";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class SessionService {
-    constructor(protected sessionRepository: SessionRepository ) {}
+    constructor(@inject(SessionRepository) protected sessionRepository: SessionRepository ) {}
 
     async createSession(userId: string, deviceName: string, ip: string, refreshToken: string) {
         const tokenData = await jwtService.getTokenData(refreshToken, SETTINGS.REFRESH_SECRET)

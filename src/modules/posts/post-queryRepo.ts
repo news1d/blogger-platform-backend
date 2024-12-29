@@ -1,8 +1,9 @@
 import {PostDBType, PostViewModel} from "../../types/post.types";
 import {ObjectId, WithId} from "mongodb";
 import {PostModel} from "../../entities/post.entity";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class PostQueryRepo {
     async getPosts(pageNumber: number,
                    pageSize: number,

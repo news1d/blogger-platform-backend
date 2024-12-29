@@ -3,9 +3,11 @@ import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../helpers/http-statuses";
 import {jwtService} from "../application/jwt-service";
 import {blacklistService} from "../blacklist/blacklist-service";
-import {sessionService} from "../composition-root";
+import {SessionService} from "../modules/sessions/session-service";
+import {container} from "../composition-root";
 
 export const ADMIN_AUTH = SETTINGS.ADMIN_AUTH;
+const sessionService = container.resolve(SessionService)
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const encodedAuthData = Buffer.from(ADMIN_AUTH).toString('base64');
