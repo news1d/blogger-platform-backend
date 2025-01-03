@@ -5,9 +5,10 @@ import {injectable} from "inversify";
 
 @injectable()
 export class UserRepository {
-    async createUser(user: UserDBType): Promise<string> {
-        const result = await UserModel.create(user);
-        return result._id.toString();
+    async createUser(userDTO: UserDBType): Promise<string> {
+        const user = new UserModel(userDTO);
+        await user.save();
+        return user._id.toString();
     }
 
     async deleteUserById(id: string): Promise<boolean> {
@@ -61,34 +62,33 @@ export class UserRepository {
     }
 
     async updateConfirmation(userId: string): Promise<boolean> {
-        const result = await UserModel.updateOne({_id: new ObjectId(userId)}, {$set: {
-            "emailConfirmation.isConfirmed": 'confirmed',
-            }})
-
-        return result.matchedCount === 1;
+        const user = await UserModel.findOne({_id: new ObjectId(userId)});
+        user!.emailConfirmation.isConfirmed = 'confirmed'
+        await user!.save()
+        return true;
     }
 
     async updateConfirmationCode(userId: string, newCode: string, newExpirationDate: Date): Promise<boolean> {
-        const result = await UserModel.updateOne({_id: new ObjectId(userId)}, {$set: {
-            "emailConfirmation.confirmationCode": newCode,
-            "emailConfirmation.expirationDate": newExpirationDate
-            }})
-        return result.matchedCount === 1;
+        const user = await UserModel.findOne({_id: new ObjectId(userId)});
+        user!.emailConfirmation.confirmationCode = newCode;
+        user!.emailConfirmation.expirationDate = newExpirationDate;
+        await user!.save()
+        return true;
     }
 
     async updateRecoveryCode(userId: string, newCode: string, newExpirationDate: Date): Promise<boolean> {
-        const result = await UserModel.updateOne({_id: new ObjectId(userId)}, {$set: {
-                "passwordRecovery.recoveryCode": newCode,
-                "passwordRecovery.expirationDate": newExpirationDate
-            }})
-        return result.matchedCount === 1;
+        const user = await UserModel.findOne({_id: new ObjectId(userId)});
+        user!.passwordRecovery.recoveryCode = newCode;
+        user!.passwordRecovery.expirationDate = newExpirationDate;
+        await user!.save()
+        return true;
     }
 
     async updatePassword(userId: string, passwordHash: string, passwordSalt: string){
-        const result = await UserModel.updateOne({_id: new ObjectId(userId)}, {$set: {
-                passwordHash: passwordHash,
-                passwordSalt: passwordSalt,
-            }})
-        return result.matchedCount === 1;
+        const user = await UserModel.findOne({_id: new ObjectId(userId)});
+        user!.passwordHash = passwordHash;
+        user!.passwordSalt = passwordSalt;
+        await user!.save()
+        return true;
     }
 }
