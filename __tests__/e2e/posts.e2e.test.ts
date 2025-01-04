@@ -5,6 +5,7 @@ import {HTTP_STATUSES} from "../../src/helpers/http-statuses";
 import {authData, bearerAuth, createPostData, postsTestManager, usersTestManager} from "../test-helpers";
 import {SETTINGS} from "../../src/settings";
 import mongoose from "mongoose";
+import {LikeStatus} from "../../src/types/like.types";
 
 
 describe('/posts', () => {
@@ -496,6 +497,58 @@ describe('/posts', () => {
                 totalCount: 2,
                 items: [firstCreatedBlog, secondCreatedBlog]
             })
+    })
+
+    it('should change the number of likes and likeStatus', async () => {
+        // Добавляем пользователя
+        const userData = {
+            login: 'lOKI',
+            password: 'password1',
+            email: 'lOKI@gmail.com',
+        }
+
+        await usersTestManager.createUser(userData)
+
+        const authData = {
+            loginOrEmail: 'lOKI',
+            password: 'password1',
+        }
+
+        const responseWithAccessToken =  await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/login`)
+            .send(authData)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const accessToken = responseWithAccessToken.body.accessToken
+
+        // Добавляем пост
+        const postData = await createPostData();
+        const createResponse = await postsTestManager.createPost(postData.validData)
+        const createdPost = createResponse.body
+
+        // Ставим лайк
+        await request(app)
+            .put(`${SETTINGS.PATH.POSTS}/${createdPost.id}/like-status`)
+            .set(bearerAuth(accessToken))
+            .send({likeStatus: LikeStatus.Like})
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        // Получаем данные о посте
+        const postDataResponse = await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
+            .set(bearerAuth(accessToken))
+            .expect(HTTP_STATUSES.OK_200)
+
+        const postBodyData = postDataResponse.body
+
+        expect(postBodyData.extendedLikesInfo.likesCount).toEqual(1)
+        expect(postBodyData.extendedLikesInfo.dislikesCount).toEqual(0)
+        expect(postBodyData.extendedLikesInfo.myStatus).toEqual(LikeStatus.Like)
+        expect(postBodyData.extendedLikesInfo.newestLikes).toEqual([{
+            addedAt: expect.any(String),
+            userId: expect.any(String),
+            login: userData.login,
+        }])
     })
 
     it('should return 204 and empty array', async () => {

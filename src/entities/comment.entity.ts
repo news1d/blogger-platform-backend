@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import {WithId} from "mongodb";
 import {CommentDBType} from "../types/comments.types";
 import {SETTINGS} from "../settings";
-import {LikesDBType, LikeStatus} from "../types/like.types";
+import {CommentLikesDBType, LikeStatus} from "../types/like.types";
 
-const likeSchema = new mongoose.Schema<LikesDBType>({
+const likeSchema = new mongoose.Schema<CommentLikesDBType>({
     createdAt: { type: Date, required: true },
     status: { type: String, enum: Object.values(LikeStatus), required: true },
     authorId: { type: String, required: true },
