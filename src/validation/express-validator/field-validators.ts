@@ -139,7 +139,7 @@ export const commentContentValidator = body('content')
     .isLength({ min: 20, max: 300 })
     .withMessage('Content should contain 20-300 characters.')
 
-export const commentLikeStatusValidator = body('likeStatus')
+export const likeStatusValidator = body('likeStatus')
     .trim()
     .isString()
     .notEmpty()
