@@ -7,6 +7,7 @@ import {authData, blogData, blogsTestManager, createPostData, postsTestManager} 
 import mongoose from "mongoose";
 import {container} from "../../src/composition-root";
 import {BlogQueryRepo} from "../../src/modules/blogs/blog-queryRepo";
+import {LikeStatus} from "../../src/types/like.types";
 
 const blogQueryRepo = container.resolve(BlogQueryRepo);
 
@@ -150,6 +151,12 @@ describe('/blogs', () => {
             blogId: blogId,
             blogName: blog!.name,
             createdAt: createdPost.createdAt,
+            extendedLikesInfo: {
+                dislikesCount: 0,
+                likesCount: 0,
+                myStatus: LikeStatus.None,
+                newestLikes: null,
+            }
         })
     })
 
