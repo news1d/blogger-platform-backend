@@ -1,3 +1,5 @@
+import {ExtendedLikesInfo, PostLikesDBType} from "./like.types";
+
 export type PostInputModel = {
     title: string;
     shortDescription: string;
@@ -13,6 +15,7 @@ export type PostViewModel = {
     blogId: string;
     blogName: string;
     createdAt: string;
+    extendedLikesInfo: ExtendedLikesInfo;
 }
 
 export type PostDBType = {
@@ -22,4 +25,7 @@ export type PostDBType = {
     blogId: string;
     blogName: string;
     createdAt: string;
+    likes: PostLikesDBType[];
+    likesCount: number;
+    dislikesCount: number;
 }
