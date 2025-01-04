@@ -2,6 +2,7 @@ import {PostDBType, PostViewModel} from "../../types/post.types";
 import {ObjectId, WithId} from "mongodb";
 import {PostModel} from "../../entities/post.entity";
 import {injectable} from "inversify";
+import {LikeStatus} from "../../types/like.types";
 
 @injectable()
 export class PostQueryRepo {
@@ -9,7 +10,8 @@ export class PostQueryRepo {
                    pageSize: number,
                    sortBy: string,
                    sortDirection: 'asc' | 'desc',
-                   blogId?: string): Promise<PostViewModel[]> {
+                   blogId?: string,
+                   userId?: string | null): Promise<PostViewModel[]> {
 
         const filter: any = {}
 
@@ -24,7 +26,7 @@ export class PostQueryRepo {
             .limit(pageSize)
             .lean()
 
-        return posts.map(this.mapToOutput)
+        return posts.map(post => this.mapToOutput(post, userId))
     }
 
     async getPostsCount(blogId?: string): Promise<number> {
@@ -37,15 +39,32 @@ export class PostQueryRepo {
         return PostModel.countDocuments(filter)
     }
 
-    async getPostById(id: string): Promise<PostViewModel | null> {
+    async getPostById(id: string, userId?: string | null): Promise<PostViewModel | null> {
         const post = await PostModel.findOne({_id: new ObjectId(id)});
         if (!post) {
             return null;
         }
-        return this.mapToOutput(post);
+        return this.mapToOutput(post, userId);
     }
 
-    mapToOutput(post: WithId<PostDBType>): PostViewModel {
+    mapToOutput(post: WithId<PostDBType>, userId?: string | null): PostViewModel {
+        const myStatus = userId
+            ? post.likes.find(like => like.userId === userId)?.status || LikeStatus.None
+            : LikeStatus.None;
+
+        // Сортировка лайков по дате создания и выбор трёх последних
+        const newestLikesArray = post.likes
+            .filter(like => like.status === LikeStatus.Like)
+            .sort((a, b) => b.addedAt.getTime() - a.addedAt.getTime())
+            .slice(0, 3)
+            .map(like => ({
+                addedAt: like.addedAt.toISOString(),
+                userId: like.userId,
+                login: like.login
+            }));
+
+        const newestLikes = newestLikesArray.length > 0 ? newestLikesArray : null;
+
         return {
             id: post._id.toString(),
             title: post.title,
@@ -54,6 +73,12 @@ export class PostQueryRepo {
             blogId: post.blogId,
             blogName: post.blogName,
             createdAt: post.createdAt,
+            extendedLikesInfo: {
+                likesCount: post.likesCount,
+                dislikesCount: post.dislikesCount,
+                myStatus: myStatus,
+                newestLikes: newestLikes,
+            }
         }
     }
 }
