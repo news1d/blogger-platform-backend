@@ -7,6 +7,7 @@ import {SETTINGS} from "../src/settings";
 import {HTTP_STATUSES} from "../src/helpers/http-statuses";
 import {container} from "../src/composition-root";
 import {BlogQueryRepo} from "../src/modules/blogs/blog-queryRepo";
+import {LikeStatus} from "../src/types/like.types";
 
 const blogQueryRepo = container.resolve(BlogQueryRepo)
 
@@ -207,6 +208,12 @@ export const postsTestManager = {
             blogId: data.blogId,
             blogName: blog!.name,
             createdAt: createdPost.createdAt,
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None,
+                newestLikes: null,
+            }
         })
         return response;
     }
