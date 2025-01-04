@@ -53,7 +53,7 @@ export class PostQueryRepo {
             : LikeStatus.None;
 
         // Сортировка лайков по дате создания и выбор трёх последних
-        const newestLikesArray = post.likes
+        const newestLikes = post.likes
             .filter(like => like.status === LikeStatus.Like)
             .sort((a, b) => b.addedAt.getTime() - a.addedAt.getTime())
             .slice(0, 3)
@@ -62,8 +62,6 @@ export class PostQueryRepo {
                 userId: like.userId,
                 login: like.login
             }));
-
-        const newestLikes = newestLikesArray.length > 0 ? newestLikesArray : null;
 
         return {
             id: post._id.toString(),
