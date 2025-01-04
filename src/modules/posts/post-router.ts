@@ -10,7 +10,7 @@ import {
     postBlogIdValidator, commentContentValidator,
     postContentValidator,
     postShortDescriptionValidator,
-    postTitleValidator, idValidator, postIdValidator
+    postTitleValidator, idValidator, postIdValidator, likeStatusValidator
 } from "../../validation/express-validator/field-validators";
 import {PostController} from "./post-controller";
 
@@ -18,7 +18,9 @@ const postController = container.resolve(PostController);
 
 export const postRouter = Router();
 
-postRouter.get('/', postController.getPosts.bind(postController))
+postRouter.get('/', getAccessTokenMiddleware,
+    errorsResultMiddleware,
+    postController.getPosts.bind(postController))
 postRouter.post('/', authMiddleware,
     postTitleValidator,
     postShortDescriptionValidator,
@@ -26,7 +28,7 @@ postRouter.post('/', authMiddleware,
     postBlogIdValidator,
     errorsResultMiddleware,
     postController.createPost.bind(postController));
-postRouter.get('/:id',
+postRouter.get('/:id', getAccessTokenMiddleware,
     idValidator,
     errorsResultMiddleware,
     postController.getPostById.bind(postController));
@@ -43,6 +45,11 @@ postRouter.delete('/:id', authMiddleware,
     errorsResultMiddleware,
     postController.deletePostById.bind(postController));
 
+postRouter.put('/:postId/like-status', accessTokenMiddleware,
+    postIdValidator,
+    likeStatusValidator,
+    errorsResultMiddleware,
+    postController.updateLikeStatus.bind(postController))
 postRouter.get('/:postId/comments',
     getAccessTokenMiddleware,
     postIdValidator,

@@ -4,6 +4,10 @@ import {UserRepository} from "../users/user-repository";
 import {PostRepository} from "./post-repository";
 import {CommentRepository} from "../comments/comment-repository";
 import {inject, injectable} from "inversify";
+import {LikeStatus} from "../../types/like.types";
+import {Result} from "../../types/result.types";
+import {createResult} from "../../helpers/result-function";
+import {DomainStatusCode} from "../../helpers/domain-status-code";
 
 @injectable()
 export class PostService {
@@ -18,7 +22,10 @@ export class PostService {
             content: body.content,
             blogId: body.blogId,
             blogName: blogName,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            likes: [],
+            likesCount: 0,
+            dislikesCount: 0,
         }
         return await this.postRepository.createPost(post);
     }
@@ -49,5 +56,22 @@ export class PostService {
 
     async deletePostById(id: string): Promise<boolean>{
         return await this.postRepository.deletePostById(id)
+    }
+
+    async updateLikeStatus(postId: string, userId: string, likeStatus: LikeStatus): Promise<Result<null>> {
+        const user = await this.userRepository.getUserById(userId);
+        const isUpdated = await this.postRepository.updateLikeStatus(postId, userId, user!.login, likeStatus)
+
+        if (!isUpdated ) {
+            return createResult(DomainStatusCode.NotFound)
+        }
+
+        const isRecalculated = await this.postRepository.updateLikesCounters(postId)
+
+        if (isRecalculated) {
+            return createResult(DomainStatusCode.Success)
+        } else {
+            return createResult(DomainStatusCode.NotFound)
+        }
     }
 }

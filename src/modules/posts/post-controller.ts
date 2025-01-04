@@ -8,6 +8,8 @@ import {PostQueryRepo} from "./post-queryRepo";
 import {BlogQueryRepo} from "../blogs/blog-queryRepo";
 import {CommentQueryRepo} from "../comments/comment-queryRepo";
 import {inject, injectable} from "inversify";
+import {LikeInputModel} from "../../types/like.types";
+import {DomainStatusCode} from "../../helpers/domain-status-code";
 
 @injectable()
 export class PostController {
@@ -18,7 +20,7 @@ export class PostController {
 
     async getPosts (req: Request, res: Response) {
         const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req)
-        const posts = await this.postQueryRepo.getPosts(pageNumber, pageSize, sortBy, sortDirection);
+        const posts = await this.postQueryRepo.getPosts(pageNumber, pageSize, sortBy, sortDirection, undefined, req.userId);
         const postsCount = await this.postQueryRepo.getPostsCount()
 
         res.status(HTTP_STATUSES.OK_200).json({
@@ -41,8 +43,7 @@ export class PostController {
     }
 
     async getPostById (req: Request<{id: string}>, res: Response<PostViewModel>) {
-        const post = await this.postQueryRepo.getPostById(req.params.id);
-
+        const post = await this.postQueryRepo.getPostById(req.params.id, req.userId);
         if (post) {
             res.status(HTTP_STATUSES.OK_200).json(post);
         } else {
@@ -73,8 +74,21 @@ export class PostController {
         }
     }
 
+    async updateLikeStatus(req: Request<{postId: string}, any, LikeInputModel>, res: Response) {
+        const result = await this.postService.updateLikeStatus(req.params.postId, req.userId!, req.body.likeStatus)
+
+        if (result.status === DomainStatusCode.NotFound){
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+            return;
+        }
+
+        if (result.status === DomainStatusCode.Success) {
+            res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+        }
+    }
+
     async getCommentsByPostId (req: Request<{postId: string}>, res: Response) {
-        const post = await this.postQueryRepo.getPostById(req.params.postId);
+        const post = await this.postQueryRepo.getPostById(req.params.postId, req.userId);
 
         if (post) {
             const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req)
@@ -93,7 +107,7 @@ export class PostController {
     }
 
     async createCommentByPostId(req: Request<{postId: string}, any, CommentInputModel>, res: Response<CommentViewModel | null>) {
-        const post = await this.postQueryRepo.getPostById(req.params.postId);
+        const post = await this.postQueryRepo.getPostById(req.params.postId, req.userId);
 
         if (post) {
             const commentId = await this.postService.createCommentByPostId(req.params.postId, req.userId!, req.body)
