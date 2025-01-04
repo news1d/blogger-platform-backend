@@ -28,31 +28,30 @@ export class CommentRepository {
     }
 
     async updateLikeStatus(commentId: string, userId: string, likeStatus: LikeStatus): Promise<boolean> {
-        const updateLike = await CommentModel.updateOne(
-            { _id: new ObjectId(commentId),
-                'likes.authorId': userId },
-            { $set: {
-                    'likes.$.status': likeStatus,
-                    'likes.$.createdAt': new Date(),
-                },
-            });
+        const comment = await CommentModel.findOne({ _id: new ObjectId(commentId) });
 
-        // Если запись о лайке не существует, добавляем новую
-        let createLikes = { matchedCount: 0 };
-        if (updateLike.matchedCount === 0) {
-            createLikes = await CommentModel.updateOne(
-                { _id: new ObjectId(commentId) },
-                { $push: {
-                        likes: {
-                            authorId: userId,
-                            status: likeStatus,
-                            createdAt: new Date()
-                        },
-                    },
-                });
+        if (!comment) {
+            return false; // Комментарий не найден
         }
 
-        return updateLike.matchedCount === 1 || createLikes.matchedCount === 1;
+        const existingLike = comment.likes.find((like) => like.authorId === userId);
+
+        if (existingLike) {
+            // Обновляем существующий лайк
+            existingLike.status = likeStatus;
+            existingLike.createdAt = new Date();
+        } else {
+            // Добавляем новый лайк
+            comment.likes.push({
+                authorId: userId,
+                status: likeStatus,
+                createdAt: new Date(),
+            });
+        }
+
+        await comment.save();
+
+        return true;
     }
 
     async updateLikesCounters(commentId: string): Promise<boolean> {
