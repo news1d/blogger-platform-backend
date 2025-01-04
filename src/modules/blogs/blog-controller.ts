@@ -40,7 +40,7 @@ export class BlogController {
 
         if (blog) {
             const {pageNumber, pageSize, sortBy, sortDirection} = paginationQueries(req);
-            const posts = await this.postQueryRepo.getPosts(pageNumber, pageSize, sortBy, sortDirection, blogId);
+            const posts = await this.postQueryRepo.getPosts(pageNumber, pageSize, sortBy, sortDirection, blogId, req.userId);
             const postsCount = await this.postQueryRepo.getPostsCount(blogId)
             res.status(HTTP_STATUSES.OK_200).json({
                 pagesCount: Math.ceil(postsCount/pageSize),
@@ -60,7 +60,7 @@ export class BlogController {
         if (blog) {
             const blogName = blog.name
             const postId = await this.blogService.createPostsByBlogId(req.params.blogId, blogName, req.body)
-            const post = await this.postQueryRepo.getPostById(postId)
+            const post = await this.postQueryRepo.getPostById(postId);
             res.status(HTTP_STATUSES.CREATED_201).json(post);
         } else {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
