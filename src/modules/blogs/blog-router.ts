@@ -9,7 +9,7 @@ import {
     postTitleValidator
 } from "../../validation/express-validator/field-validators";
 import {errorsResultMiddleware} from "../../validation/express-validator/errors-result-middleware";
-import {authMiddleware} from "../../middlewares/authorization-middleware";
+import {authMiddleware, getAccessTokenMiddleware} from "../../middlewares/authorization-middleware";
 import {validateBlogQueryParams} from "../../validation/express-validator/query-validators";
 import {BlogController} from "./blog-controller";
 
@@ -26,7 +26,7 @@ blogRouter.post('/', authMiddleware,
     blogWebsiteUrlValidator,
     errorsResultMiddleware,
     blogController.createBlog.bind(blogController));
-blogRouter.get('/:blogId/posts',
+blogRouter.get('/:blogId/posts', getAccessTokenMiddleware,
     validateBlogQueryParams,
     blogIdValidator,
     errorsResultMiddleware,
