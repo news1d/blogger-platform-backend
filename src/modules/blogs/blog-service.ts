@@ -27,7 +27,10 @@ export class BlogService {
             content: body.content,
             blogId: blogId,
             blogName: blogName,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            likes: [],
+            likesCount: 0,
+            dislikesCount: 0,
         }
 
         return await this.postRepository.createPost(post)
